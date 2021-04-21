@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="fa981f71-8ad9-4d5c-923d-973ab838911f" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/.gitattributes" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/ActiveStrategy.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/AlgorithmExecRand.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/AlgorithmExecutor.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/AllIn1File_Main3.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/BanditsRandom.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/Constants.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/EXsmac.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/EXsmacAlgoExecutor.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/ExThreads.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/ExhaustiveSearch.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/FillData.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/Main.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/Metric.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/OldMain.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/ProfileMetrics.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/RFRS.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/RLrfAlgoEx.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/RLsmac.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/RLsmacAlgoEx.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/RLsmacEiAlgoEx.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/RLthread.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/RLthreadBase.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/RLthreadRFRS.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/RSthread.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/RandSearchAlgoExecutor.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/RandomSearch.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/ThreadsRand.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/clean" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/customsmac/ei_optimization.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/customsmac/smac_facade.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/customsmac/smbo.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/install_custom_pyrfr.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/mab_solvers/MabSolver.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/mab_solvers/MaxEiSolver.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/mab_solvers/Smx_R.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/mab_solvers/Smx_SRSU.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/mab_solvers/Softmax.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/mab_solvers/UCB.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/mab_solvers/UCB_SRSU.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/mab_solvers/UCB_SRU.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/mab_solvers/Uniform.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_active.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_active_1.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_active_11.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_active_111.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_active_211.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_active_311.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_active_all_good.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_active_haberman.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_all.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_ex-smac_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_ex-smac_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_ex-smac_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_exhaustive_1.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_exhaustive_11.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_exhaustive_111.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_exhaustive_211.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_exhaustive_311.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_random_1.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_random_11.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_random_111.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_random_211.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_random_311.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_rl-smac_glass_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_rl-smac_glass_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_rl-smac_glass_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_rl-smac_haberman_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_rl-smac_haberman_ch_i10-100.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_rl-smac_haberman_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_rl-smac_haberman_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_rl-smac_indiandiabets_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_rl-smac_indiandiabets_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_rl-smac_indiandiabets_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_rl-smac_iris_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_rl-smac_iris_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_rl-smac_iris_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_rl-smac_krvskp_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_rl-smac_krvskp_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_rl-smac_krvskp_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_rl-smac_small_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_rl-smac_small_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_rl-smac_small_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_rl-smac_wholesale_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_rl-smac_wholesale_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_rl-smac_wholesale_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_rl-smac_yeast_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_rl-smac_yeast_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_rl-smac_yeast_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_tl-smac_shuttle.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_tl-smac_t100_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_tl-smac_t100_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_tl-smac_t100_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_tl-smac_t1200_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_tl-smac_t1200_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_tl-smac_t1200_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_tl-smac_t200_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_tl-smac_t200_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_tl-smac_t200_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_tl-smac_t25_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_tl-smac_t25_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_tl-smac_t25_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_tl-smac_t300_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_tl-smac_t300_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_tl-smac_t300_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_tl-smac_t400_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_tl-smac_t400_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_tl-smac_t400_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_tl-smac_t50_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_tl-smac_t50_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_tl-smac_t50_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_tl-smac_t600_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_tl-smac_t600_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/old_scripts/run_tl-smac_t600_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/pre-run.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/requirements.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run-rs-all.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t100_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t100_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t100_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t1200_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t1200_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t1200_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t200_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t200_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t200_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t2400_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t2400_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t2400_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t25_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t25_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t25_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t300_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t300_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t300_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t400_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t400_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t400_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t50_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t50_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t50_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t600_ch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t600_cop.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/run/run_rs_t600_sil.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/smk/PureAlgoThread.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/smk/SMK.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/utils/BoxPlotGraphicsBuilder.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/utils/DebugMetrics.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/utils/DebugPyrfr.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/utils/DefaultClustering.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/utils/FindBest.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/utils/ListShape.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/utils/PrepcessData.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/utils/ResultParser.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/heuristic_clustering/utils/ShadeGraphicsBuilder.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="JupyterTrust" id="23699728-e843-4e19-b1a9-183fc4765562" />
+  <component name="ProjectId" id="1qfn32PuFGlXDupXbnsm3MN8cDC" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../AutoClustering" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="fa981f71-8ad9-4d5c-923d-973ab838911f" name="Default Changelist" comment="" />
+      <created>1617479309274</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1617479309274</updated>
+      <workItem from="1617479311724" duration="1769000" />
+      <workItem from="1618491035446" duration="1023000" />
+      <workItem from="1618517516101" duration="4137000" />
+      <workItem from="1619026186630" duration="440000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="549" y="167" key="FileChooserDialogImpl" timestamp="1619026270331">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="549" y="167" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1619026270331" />
+  </component>
+</project>
