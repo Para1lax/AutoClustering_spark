@@ -2,6 +2,7 @@ import time
 
 import numpy as np
 
+#TODO: Use spark RF regressor
 from sklearn.ensemble import RandomForestRegressor
 
 import Constants
@@ -11,7 +12,7 @@ from RLthreadRFRS import RLthreadRFRS
 class RLrfrsAlgoEx:
     clu_algos = Constants.algos
 
-    def __init__(self, metric, data, seed, batch_size, expansion=5000):
+    def __init__(self, data, metric, seed, batch_size, expansion=5000):
         self.metric = metric
         self.data = data
         self.run_num = np.array([0] * Constants.num_algos)
@@ -21,33 +22,33 @@ class RLrfrsAlgoEx:
         self.seed = seed
         self.batch_size = batch_size
         self.optimizers = []
-        self.th = []
+        self.clustering_threads = []
 
         # create all clustering threads in advance:
         for i in range(0, Constants.num_algos):
-            self.th.append(
+            self.clustering_threads.append(
                 RLthreadRFRS(self.clu_algos[i], self.metric, self.data, self.seed, self.batch_size, expansion=expansion))
-            self.optimizers.append(self.th[i].optimizer)
+            self.optimizers.append(self.clustering_threads[i].optimizer)
 
         self.rf = RandomForestRegressor(n_estimators=1000, random_state=42)
 
-    def apply(self, arm, file, iteration_number, remaining_time=None, current_time=0):
-        th = self.th[arm]
+    def apply(self, arm, log_file, iteration_number, remaining_time=None, current_time=0):
+        clustering_thread = self.clustering_threads[arm]
 
         # initially, run_num for each arm == 0, thus we allocate 1 batch of target f calls:
-        th.new_scenario(self.run_num[arm] + 1, remaining_time)  # add budget
+        clustering_thread.new_scenario(self.run_num[arm] + 1, remaining_time)  # add budget
 
         run_start = time.time()
-        th.run()
+        clustering_thread.run()
         run_spent = int(time.time()-run_start)
 
         self.run_num[arm] += 1
-        reward = th.value
+        reward = clustering_thread.value
 
         if reward < self.best_val:
             self.best_val = reward
-            self.best_param = th.parameters
-            self.best_algo = th.thread_name
+            self.best_param = clustering_thread.parameters
+            self.best_algo = clustering_thread.thread_name
         log_string = str(iteration_number) \
                      + ', ' + self.metric \
                      + ', ' + str(self.best_val) \
@@ -61,4 +62,4 @@ class RLrfrsAlgoEx:
 
         # best value in random forest if the smallest one. Algo Executor provides the REWARD.
         # The smaller value is, the better reward should be.
-        return -1.0 * th.optimizer.get_best_from_forest()
+        return -1.0 * clustering_thread.optimizer.get_best_from_forest()

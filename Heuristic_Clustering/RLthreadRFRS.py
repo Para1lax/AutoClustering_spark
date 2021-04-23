@@ -1,6 +1,7 @@
 import threading
 
 import numpy as np
+#TODO: rewrite ConfigSpace part according to lastest version
 from ConfigSpace.conditions import InCondition
 from ConfigSpace.hyperparameters import CategoricalHyperparameter, \
     UniformFloatHyperparameter, UniformIntegerHyperparameter
@@ -25,9 +26,9 @@ from customsmac.smbo import SMBO
 
 class RLthreadRFRS(ClusteringArmThread):
 
-    def __init__(self, name, metric, X, seed, batch_size, expansion=5000):
+    def __init__(self, name, metric, data, seed, batch_size, expansion=5000):
         self.run_count = batch_size
-        ClusteringArmThread.__init__(self, name, metric, X, seed)  # populates config space
+        ClusteringArmThread.__init__(self, name, metric, data, seed)  # populates config space
         self.new_scenario(1)  # initial scenario
 
         self.optimizer = RFRS(scenario=self.clu_scenario,

@@ -1,9 +1,11 @@
+# UP TO SPARK
+
 import time
 from os import walk
 from sys import argv
 
 import numpy as np
-import pandas as pd
+# import pandas as pd
 
 import RLsmacAlgoEx as ae
 import Constants
@@ -81,7 +83,7 @@ from mab_solvers.Uniform import Uniform
 
 
 # checking rfrsls-ucb-SRSU only
-def configure_mab_solver(algorithm, metric, X, seed):
+def configure_mab_solver(data, algorithm = Constants.algorithm, metric=Constants.metrics, seed=42):
     """
     Creates and configures the corresponding MAB-solver.
     :param algorithm: algorithm to be used.
@@ -89,8 +91,8 @@ def configure_mab_solver(algorithm, metric, X, seed):
 
     print("===============MAB_SOLVER===============")
     # algorithm.startswith("rfrsls-ucb-SRSU"):
-    algo_e = RLrfrsAlgoEx(metric, X, seed, batch_size, expansion=100)
-    mab_solver = UCBsrsu(action=algo_e, time_limit=time_limit)
+    algorithm_executor = RLrfrsAlgoEx(data, metric, seed, batch_size, expansion=100)
+    mab_solver = UCBsrsu(action=algorithm_executor, time_limit=time_limit)
 
     return mab_solver
 
@@ -103,7 +105,8 @@ def run(spark_df, seed, metric, output_file):
     f = open(file=output_file, mode='a')
 
     # core part:
-    mab_solver = configure_mab_solver(algorithm, metric, spark_df, seed)
+    # initializing multi-arm bandit solver:
+    mab_solver = configure_mab_solver(spark_df, algorithm, metric, seed)
 
     start = time.time()
     # Random initialization:
@@ -118,7 +121,8 @@ def run(spark_df, seed, metric, output_file):
     print("#PROFILE: time spent in initialize: " + str(time_init))
     print("#PROFILE: time spent in iterations:" + str(time_iterations))
 
-    algo_e = mab_solver.action
+    # algorithm_executor
+    algorithm_executor = mab_solver.action
 
     f.write("Metric: " + metric + ' : ' + str(algo_e.best_val) + '\n')
     f.write("Algorithm: " + str(algo_e.best_algo) + '\n')
