@@ -11,11 +11,11 @@ from RLthreadBase import ClusteringArmThread
 class UCB(MabSolver):
     def __init__(self, action, is_fair=False, time_limit=None):
         MabSolver.__init__(self, action, time_limit)
-        self.num = Constants.num_algos
-        self.rewards = np.array([0.0] * self.num)
+        self.num_algos = Constants.num_algos
+        self.rewards = np.zeros(Constants.num_algos)
         # self.spendings = [[] for i in range(0, self.num)]
         # self.avg_spendings = [1] * Constants.num_algos
-        self.n = np.array([1] * self.num)
+        self.n = np.array([1] * self.num_algos)
         self.name = "ucb"
         self.iter = 1
         self.is_fair = is_fair
@@ -36,7 +36,7 @@ class UCB(MabSolver):
     #             ex.best_param = random_cfg
     #             ex.best_algo = ex.clu_algos[i]
 
-    def initialize(self, f, true_labels=None):
+    def initialize(self, log_file, true_labels=None):
         """
         Initialize rewards. We use here the same value,
         gained by calculating metrics on randomly assigned labels.
@@ -44,6 +44,7 @@ class UCB(MabSolver):
         print("\nInit UCB1")
         n_clusters = 15
         labels = np.random.randint(0, n_clusters, len(self.action.X))
+        print("self.action.X: \n {}".format(self.action.X))
         for c in range(0, n_clusters):
             labels[c] = c
         np.random.shuffle(labels)
@@ -53,7 +54,7 @@ class UCB(MabSolver):
         for i in range(0, Constants.num_algos):
             self.rewards[i] = -res  # the smallest value is, the better.
         # self.consume_limit(time.time() - start)
-        f.write("Init rewards: " + str(self.rewards) + '\n')
+        log_file.write("Init rewards: " + str(self.rewards) + '\n')
 
     def draw(self):
         values = self.rewards
