@@ -97,7 +97,7 @@ def configure_mab_solver(data, algorithm = Constants.algorithm, metric=Constants
     return mab_solver
 
 
-def run(spark_df, seed, metric, output_file):
+def run(spark_df, seed=42, metric='sil', output_file='heuristic_clustering_output', algorithm=Constants.algorithm):
 
     true_labels = None
 
