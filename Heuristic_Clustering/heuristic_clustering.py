@@ -116,7 +116,7 @@ def run(spark_df, seed=42, metric='sil', output_file='heuristic_clustering_outpu
 
     # core part:
     # initializing multi-arm bandit solver:
-    mab_solver = configure_mab_solver(spark_df, algorithm, metric, seed)
+    mab_solver = configure_mab_solver(spark_df, algorithm=algorithm, metric=metric, seed=seed)
 
     start = time.time()
     # Random initialization:
