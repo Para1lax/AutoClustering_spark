@@ -83,7 +83,9 @@ from mab_solvers.Uniform import Uniform
 
 
 # checking rfrsls-ucb-SRSU only
-def configure_mab_solver(data, algorithm = Constants.algorithm, metric=Constants.metrics, seed=42):
+def configure_mab_solver(data, seed=42, metric='sil', output_file='heuristic_clustering_output',\
+                         algorithm=Constants.algorithm, batch_size=Constants.batch_size,\
+                         time_limit=Constants.tuner_timeout, iterations=Constants.bandit_iterations):
     """
     Creates and configures the corresponding MAB-solver.
     :param algorithm: algorithm to be used.
@@ -96,8 +98,16 @@ def configure_mab_solver(data, algorithm = Constants.algorithm, metric=Constants
 
     return mab_solver
 
-
-def run(spark_df, seed=42, metric='sil', output_file='heuristic_clustering_output', algorithm=Constants.algorithm):
+# algorithm = Constants.algorithm
+# # algorithm = 'rl-ei'
+# batch_size = Constants.batch_size
+# # batch_size = 1200
+# time_limit = Constants.tuner_timeout
+# # time_limit = 1000
+# iterations = Constants.bandit_iterations
+# # iterations = 5000
+def run(spark_df, seed=42, metric='sil', output_file='heuristic_clustering_output', algorithm=Constants.algorithm,\
+        batch_size=Constants.batch_size, time_limit=Constants.tuner_timeout, iterations=Constants.bandit_iterations):
 
     true_labels = None
 

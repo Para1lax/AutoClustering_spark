@@ -1,3 +1,5 @@
+print("START")
+
 try:
     from pyspark import SparkContext, SparkConf
     from pyspark.sql import SparkSession
@@ -11,6 +13,7 @@ spark = SparkSession \
 
 from pyspark.sql.types import *
 from pyspark.sql import SQLContext
+
 sqlCtx = SQLContext(sc)
 
 # Auxiliar functions
