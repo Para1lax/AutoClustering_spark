@@ -1,3 +1,13 @@
+try:
+    from pyspark import SparkContext, SparkConf
+    from pyspark.sql import SparkSession
+except ImportError as e:
+    print('<<<<<!!!!! Please restart your kernel after installing Apache Spark !!!!!>>>>>')
+sc = SparkContext.getOrCreate(SparkConf().setMaster("local[*]"))
+
+spark = SparkSession \
+    .builder \
+    .getOrCreate()
 
 from pyspark.sql.types import *
 from pyspark.sql import SQLContext
