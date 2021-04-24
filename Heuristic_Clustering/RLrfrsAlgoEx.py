@@ -12,7 +12,7 @@ from RLthreadRFRS import RLthreadRFRS
 class RLrfrsAlgoEx:
     clu_algos = Constants.algos
 
-    def __init__(self, data, metric, seed, batch_size, expansion=5000):
+    def __init__(self, data, metric='sil', seed=42, batch_size=Constants.batch_size, expansion=5000):
         self.metric = metric
         self.data = data
         self.run_num = np.array([0] * Constants.num_algos)
