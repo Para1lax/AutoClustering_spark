@@ -10,7 +10,7 @@ import numpy as np
 import RLsmacAlgoEx as ae
 import Constants
 from mab_solvers.MaxEiSolver import MaxEi
-from RLrfAlgoEx import RLrfrsAlgoEx
+from RLrfAlgoEx import RLrfAlgoEx
 from RLsmacEiAlgoEx import RLsmacEiAlgoEx
 from mab_solvers.Smx_R import SoftmaxR
 from mab_solvers.Smx_SRSU import SoftmaxSRSU
@@ -93,9 +93,9 @@ def configure_mab_solver(data, seed=42, metric='sil', output_file='heuristic_clu
 
     print("===============MAB_SOLVER===============")
     # algorithm.startswith("rfrsls-ucb-SRSU"):
-    algorithm_executor = RLrfrsAlgoEx(data=data, metric=metric, seed=seed, batch_size=batch_size, expansion=100)
+    algorithm_executor = RLrfAlgoEx(data=data, metric=metric, seed=seed, batch_size=batch_size, expansion=100)
     if Constants.DEBUG:
-        print("RLrfrsAlgoEx.X: {}".format(algorithm_executor.X))
+        print("RLrfAlgoEx.X: {}".format(algorithm_executor.X))
     mab_solver = UCBsrsu(action=algorithm_executor, time_limit=time_limit)
 
     return mab_solver

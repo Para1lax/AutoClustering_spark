@@ -8,12 +8,12 @@ import Constants
 from RLthreadRFRS import RLthreadRFRS
 
 
-class RLrfrsAlgoEx:
+class RLrfAlgoEx:
     clu_algos = Constants.algos
 
-    def __init__(self, metric, X, seed, batch_size, expansion=5000):
+    def __init__(self, data, metric='sil', seed=42, batch_size=Constants.batch_size, expansion=5000):
         self.metric = metric
-        self.X = X
+        self.data = data
         self.run_num = np.array([0] * Constants.num_algos)
         self.best_val = Constants.best_init
         self.best_param = dict()
@@ -24,9 +24,10 @@ class RLrfrsAlgoEx:
         self.th = []
 
         # create all clustering threads in advance:
+        # TODO: change RLthreadRFRS
         for i in range(0, Constants.num_algos):
             self.th.append(
-                RLthreadRFRS(self.clu_algos[i], self.metric, self.X, self.seed, self.batch_size, expansion=expansion))
+                RLthreadRFRS(self.clu_algos[i], self.metric, self.data, self.seed, self.batch_size, expansion=expansion))
             self.optimizers.append(self.th[i].optimizer)
 
         self.rf = RandomForestRegressor(n_estimators=1000, random_state=42)
@@ -39,7 +40,7 @@ class RLrfrsAlgoEx:
 
         run_start = time.time()
         th.run()
-        run_spent = int(time.time()-run_start)
+        run_spent = int(time.time() - run_start)
 
         self.run_num[arm] += 1
         reward = th.value
