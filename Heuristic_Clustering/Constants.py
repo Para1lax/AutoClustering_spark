@@ -1,5 +1,7 @@
 from sys import float_info
 
+DEBUG=True
+
 kmeans_algo = "KMeans"
 affinity_algo = "Affinity_Propagation"
 mean_shift_algo = "Mean_Shift"

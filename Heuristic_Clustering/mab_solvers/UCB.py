@@ -44,7 +44,8 @@ class UCB(MabSolver):
         print("\nInit UCB1")
         n_clusters = 15
         labels = np.random.randint(0, n_clusters, len(self.action.X))
-        print("self.action.X: \n {}".format(self.action.X))
+        if Constants.DEBUG:
+            print("self.action.X: \n {}".format(self.action.X))
         for c in range(0, n_clusters):
             labels[c] = c
         np.random.shuffle(labels)
