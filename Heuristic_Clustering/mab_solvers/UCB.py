@@ -20,22 +20,6 @@ class UCB(MabSolver):
         self.iter = 1
         self.is_fair = is_fair
 
-    # def initialize(self, f):
-    #     print("\nInit UCB1")
-    #     for i in range(0, self.num):
-    #         ex = self.action  # AlgoExecutor
-    #         t = ClusteringArmThread(ex.clu_algos[i], ex.metric, ex.X, ex.seed)
-    #         random_cfg = t.clu_cs.sample_configuration()
-    #
-    #         # run on random config and get reward:
-    #         reward = t.clu_run(random_cfg)
-    #         self.rewards[i] = (Constants.in_reward - reward) / Constants.in_reward
-    #
-    #         if reward < ex.best_val:
-    #             ex.best_val = reward
-    #             ex.best_param = random_cfg
-    #             ex.best_algo = ex.clu_algos[i]
-
     def initialize(self, log_file, true_labels=None):
         """
         Initialize rewards. We use here the same value,
@@ -43,13 +27,12 @@ class UCB(MabSolver):
         """
         print("\nInit UCB1")
         n_clusters = 15
-        labels = np.random.randint(0, n_clusters, len(self.action.X))
-        if Constants.DEBUG:
-            print("self.action.X: \n {}".format(self.action.X))
+        labels = np.random.randint(0, n_clusters, self.action.data.count())
         for c in range(0, n_clusters):
             labels[c] = c
         np.random.shuffle(labels)
-        res = Metric.metric(self.action.X, n_clusters, labels, self.action.metric, true_labels)
+        # TODO: rewrite Metric to Spark
+        res = Metric.metric(self.action.data.toPandas().values, n_clusters, labels, self.action.metric, true_labels)
 
         # start = time.time()
         for i in range(0, Constants.num_algos):

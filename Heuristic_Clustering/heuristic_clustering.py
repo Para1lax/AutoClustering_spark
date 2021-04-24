@@ -94,8 +94,6 @@ def configure_mab_solver(data, seed=42, metric='sil', output_file='heuristic_clu
     print("===============MAB_SOLVER===============")
     # algorithm.startswith("rfrsls-ucb-SRSU"):
     algorithm_executor = RLrfAlgoEx(data=data, metric=metric, seed=seed, batch_size=batch_size, expansion=100)
-    if Constants.DEBUG:
-        print("RLrfAlgoEx.X: {}".format(algorithm_executor.X))
     mab_solver = UCBsrsu(action=algorithm_executor, time_limit=time_limit)
 
     return mab_solver
