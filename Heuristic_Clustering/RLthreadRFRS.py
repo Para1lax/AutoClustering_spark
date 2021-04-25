@@ -1,40 +1,31 @@
 import threading
 
 import numpy as np
-#TODO: rewrite ConfigSpace part according to lastest version
-from ConfigSpace.conditions import InCondition
-from ConfigSpace.hyperparameters import CategoricalHyperparameter, \
-    UniformFloatHyperparameter, UniformIntegerHyperparameter
-from sklearn.cluster import AffinityPropagation
-from sklearn.cluster import AgglomerativeClustering
-from sklearn.cluster import DBSCAN
-from sklearn.cluster import KMeans
-from sklearn.cluster import MeanShift, estimate_bandwidth
-from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
-from smac.configspace import ConfigurationSpace
 
 from RFRS import RFRS
-from customsmac.smac_facade import SMAC
 from smac.scenario.scenario import Scenario
 
 import Constants
-import Metric
 from RLthreadBase import ClusteringArmThread
-from customsmac.ei_optimization import InterleavedLocalAndRandomSearch
-from customsmac.smbo import SMBO
 
 
 class RLthreadRFRS(ClusteringArmThread):
-
-    def __init__(self, name, metric, data, seed, batch_size, expansion=5000):
+    def __init__(self, data: pyspark.sql.dataframe.DataFrame, \
+                 algorithm_name: str, \
+                 metric: str, \
+                 seed: int, \
+                 batch_size: int,
+                 expansion=5000):
         self.run_count = batch_size
-        ClusteringArmThread.__init__(self, name, metric, data, seed)  # populates config space
+        # TODO: rewrite RLthreadBase
+        ClusteringArmThread.__init__(self, algorithm_name, metric, data.toPandas().values, seed)  # populates config space
         self.new_scenario(1)  # initial scenario
 
+        #TODO: rewrite RFRS
         self.optimizer = RFRS(scenario=self.clu_scenario,
-                         tae_runner=self.clu_run,
-                         expansion_number=expansion,
-                         batch_size=batch_size)
+                              tae_runner=self.clu_run,
+                              expansion_number=expansion,
+                              batch_size=batch_size)
 
     def new_scenario(self, c, remaining_time=None):
         # remaining_time is usually expected to be way more than needed for one call,

@@ -81,10 +81,9 @@ from mab_solvers.Uniform import Uniform
 #     return mab_solver
 
 
-
 # checking rfrsls-ucb-SRSU only
-def configure_mab_solver(data, seed=42, metric='sil', output_file='heuristic_clustering_output',\
-                         algorithm=Constants.algorithm, batch_size=Constants.batch_size,\
+def configure_mab_solver(data, seed=42, metric='sil', output_file='heuristic_clustering_output', \
+                         algorithm=Constants.algorithm, batch_size=Constants.batch_size, \
                          time_limit=Constants.tuner_timeout, iterations=Constants.bandit_iterations):
     """
     Creates and configures the corresponding MAB-solver.
@@ -98,6 +97,7 @@ def configure_mab_solver(data, seed=42, metric='sil', output_file='heuristic_clu
 
     return mab_solver
 
+
 # algorithm = Constants.algorithm
 # # algorithm = 'rl-ei'
 # batch_size = Constants.batch_size
@@ -106,9 +106,8 @@ def configure_mab_solver(data, seed=42, metric='sil', output_file='heuristic_clu
 # # time_limit = 1000
 # iterations = Constants.bandit_iterations
 # # iterations = 5000
-def run(spark_df, seed=42, metric='sil', output_file='heuristic_clustering_output', algorithm=Constants.algorithm,\
+def run(spark_df, seed=42, metric='sil', output_file='heuristic_clustering_output', algorithm=Constants.algorithm, \
         batch_size=Constants.batch_size, time_limit=Constants.tuner_timeout, iterations=Constants.bandit_iterations):
-
     true_labels = None
 
     # X = np.array(data, dtype=np.double)  # change to spark df

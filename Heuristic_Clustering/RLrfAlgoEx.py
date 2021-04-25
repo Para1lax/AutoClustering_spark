@@ -27,7 +27,7 @@ class RLrfAlgoEx:
         # TODO: change RLthreadRFRS
         for i in range(0, Constants.num_algos):
             self.th.append(
-                RLthreadRFRS(self.clu_algos[i], self.metric, self.data.toPandas().values, self.seed, self.batch_size, expansion=expansion))
+                RLthreadRFRS(self.data, self.clu_algos[i], self.metric, self.seed, self.batch_size, expansion=expansion))
             self.optimizers.append(self.th[i].optimizer)
 
         self.rf = RandomForestRegressor(n_estimators=1000, random_state=42)
