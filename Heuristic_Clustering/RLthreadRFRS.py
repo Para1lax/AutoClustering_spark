@@ -12,7 +12,7 @@ from smac.scenario.scenario import Scenario
 
 
 class RLthreadRFRS(ClusteringArmThread):
-    def __init__(self, data: pyspark.sql.dataframe.DataFrame, \
+    def __init__(self, data: DataFrame, \
                  algorithm_name: str, \
                  metric: str, \
                  seed: int, \
