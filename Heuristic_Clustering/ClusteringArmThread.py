@@ -21,10 +21,10 @@ import Metric
 
 
 class ClusteringArmThread:
-    def __init__(self, name, metric, X, seed):
+    def __init__(self, data, name, metric, seed):
         self.thread_name = name
         self.metric = metric
-        self.X = X
+        self.data = data
         self.value = Constants.bad_cluster
         self.parameters = dict()
         self.seed = seed
@@ -95,7 +95,7 @@ class ClusteringArmThread:
         elif (self.thread_name == Constants.affinity_algo):
             cl = AffinityPropagation(**cfg)
         elif (self.thread_name == Constants.mean_shift_algo):
-            bandwidth = estimate_bandwidth(self.X, quantile=cfg['quantile'])
+            bandwidth = estimate_bandwidth(self.data, quantile=cfg['quantile'])
             cl = MeanShift(bandwidth=bandwidth, bin_seeding=bool(cfg['bin_seeding']), min_bin_freq=cfg['min_bin_freq'],
                            cluster_all=bool(cfg['cluster_all']))
         elif (self.thread_name == Constants.ward_algo):
@@ -115,12 +115,12 @@ class ClusteringArmThread:
             cl = BayesianGaussianMixture(**cfg)
 
         try:
-            cl.fit(self.X)
+            cl.fit(self.data)
         except:
             try:
                 exc_info = sys.exc_info()
                 try:
-                    cl.fit(self.X)  # try again
+                    cl.fit(self.data)  # try again
                 except:
                     pass
             finally:
@@ -131,7 +131,7 @@ class ClusteringArmThread:
                 return Constants.bad_cluster
 
         if (self.thread_name == Constants.gm_algo) or (self.thread_name == Constants.bgm_algo):
-            labels = cl.predict(self.X)
+            labels = cl.predict(self.data)
         else:
             labels = cl.labels_
         return labels
@@ -140,6 +140,6 @@ class ClusteringArmThread:
         labels = self.cluster(cfg)
         labels_unique = np.unique(labels)
         n_clusters = len(labels_unique)
-        value = Metric.metric(self.X, n_clusters, labels, self.metric)
+        value = Metric.metric(self.data, n_clusters, labels, self.metric)
 
         return value

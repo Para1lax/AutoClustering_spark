@@ -20,7 +20,7 @@ class RLthreadRFRS(ClusteringArmThread):
                  expansion=5000):
         self.run_count = batch_size
         # TODO: rewrite RLthreadBase
-        ClusteringArmThread.__init__(self, algorithm_name, metric, data.toPandas().values, seed)  # populates config space
+        ClusteringArmThread.__init__(self, data.toPandas().values, algorithm_name, metric, seed)  # populates config space
         self.new_scenario(1)  # initial scenario
 
         #TODO: rewrite RFRS

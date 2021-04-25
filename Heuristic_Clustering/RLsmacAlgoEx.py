@@ -8,9 +8,9 @@ import RLthread as t
 class RLsmacAlgoEx:
     clu_algos = Constants.algos
 
-    def __init__(self, metric, X, seed, batch_size):
+    def __init__(self, data, metric, seed, batch_size):
         self.metric = metric
-        self.X = X
+        self.data = data
         self.run_num = np.array([0] * Constants.num_algos)
         self.best_val = Constants.best_init
         self.best_param = dict()
@@ -22,7 +22,7 @@ class RLsmacAlgoEx:
 
         # create all clustering threads in advance:
         for i in range(0, Constants.num_algos):
-            self.th.append(t.RLthread(self.clu_algos[i], self.metric, self.X, self.seed, self.batch_size))
+            self.th.append(t.RLthread(self.data, self.clu_algos[i], self.metric, self.seed, self.batch_size))
             self.smacs.append(self.th[i].smac)
 
     def apply(self, arm, file, iteration_number, remaining_time=None):
