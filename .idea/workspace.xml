@@ -18,8 +18,8 @@
   <component name="ChangeListManager">
     <list default="true" id="fa981f71-8ad9-4d5c-923d-973ab838911f" name="Default Changelist" comment="adding files">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Heuristic_Clustering/RLrfAlgoEx.py" beforeDir="false" afterPath="$PROJECT_DIR$/Heuristic_Clustering/RLrfAlgoEx.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Heuristic_Clustering/RLthreadRFRS.py" beforeDir="false" afterPath="$PROJECT_DIR$/Heuristic_Clustering/RLthreadRFRS.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Heuristic_Clustering/heuristic_clustering.py" beforeDir="false" afterPath="$PROJECT_DIR$/Heuristic_Clustering/heuristic_clustering.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,7 +87,7 @@
       <workItem from="1618491035446" duration="1023000" />
       <workItem from="1618517516101" duration="4137000" />
       <workItem from="1619026186630" duration="19732000" />
-      <workItem from="1619379109271" duration="3403000" />
+      <workItem from="1619379109271" duration="3963000" />
     </task>
     <task id="LOCAL-00001" summary="adding files">
       <created>1619029258566</created>

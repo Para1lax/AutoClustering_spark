@@ -2,11 +2,12 @@ import threading
 
 import numpy as np
 
+import Constants
+import utils
+
+from RLthreadBase import ClusteringArmThread
 from RFRS import RFRS
 from smac.scenario.scenario import Scenario
-
-import Constants
-from RLthreadBase import ClusteringArmThread
 
 
 class RLthreadRFRS(ClusteringArmThread):

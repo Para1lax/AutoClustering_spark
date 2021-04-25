@@ -9,6 +9,7 @@ import numpy as np
 
 import RLsmacAlgoEx as ae
 import Constants
+import utils
 from mab_solvers.MaxEiSolver import MaxEi
 from RLrfAlgoEx import RLrfAlgoEx
 from RLsmacEiAlgoEx import RLsmacEiAlgoEx
