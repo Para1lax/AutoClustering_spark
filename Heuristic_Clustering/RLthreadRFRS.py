@@ -4,6 +4,7 @@ import numpy as np
 
 import Constants
 import utils
+from pyspark.sql.types import *
 
 from RLthreadBase import ClusteringArmThread
 from RFRS import RFRS
