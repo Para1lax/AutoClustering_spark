@@ -134,8 +134,8 @@ def run(spark_df, seed=42, metric='sil', output_file='heuristic_clustering_outpu
     # algorithm_executor
     algorithm_executor = mab_solver.action
 
-    f.write("Metric: " + metric + ' : ' + str(algo_e.best_val) + '\n')
-    f.write("Algorithm: " + str(algo_e.best_algo) + '\n')
+    f.write("Metric: " + metric + ' : ' + str(algorithm_executor.best_val) + '\n')
+    f.write("Algorithm: " + str(algorithm_executor.best_algo) + '\n')
     f.write("# Target func calls: " + str(its * batch_size) + '\n')
     f.write("# Time init: " + str(time_init) + '\n')
     f.write("# Time spent: " + str(time_iterations) + '\n')
@@ -148,11 +148,11 @@ def run(spark_df, seed=42, metric='sil', output_file='heuristic_clustering_outpu
         f.write("# Arms avg time: []")
         pass
 
-    f.write(str(algo_e.best_param) + "\n\n")
+    f.write(str(algorithm_executor.best_param) + "\n\n")
 
     f.write("SMACS: \n")
-    if hasattr(algo_e, "smacs"):
-        for s in algo_e.smacs:
+    if hasattr(algorithm_executor, "smacs"):
+        for s in algorithm_executor.smacs:
             try:
                 stats = s.get_tae_runner().stats
                 t_out = stats._logger.info
@@ -164,7 +164,7 @@ def run(spark_df, seed=42, metric='sil', output_file='heuristic_clustering_outpu
 
         f.write("\n")
         for i in range(0, Constants.num_algos):
-            s = algo_e.smacs[i]
+            s = algorithm_executor.smacs[i]
             _, Y = s.solver.rh2EPM.transform(s.solver.runhistory)
             f.write(Constants.algos[i] + ":\n")
             f.write("Ys:\n")
@@ -179,7 +179,7 @@ def run(spark_df, seed=42, metric='sil', output_file='heuristic_clustering_outpu
     if algorithm.startswith("rl-max-ei"):
         log = mab_solver.tops_log
     elif algorithm.startswith("rl-ei"):
-        log = algo_e.tops_log
+        log = algorithm_executor.tops_log
     else:
         log = []
 
