@@ -7,7 +7,6 @@ import numpy as np
 import Constants
 import Metric
 from mab_solvers.MabSolver import MabSolver
-from RLthreadBase import ClusteringArmThread
 
 
 class Uniform(MabSolver):

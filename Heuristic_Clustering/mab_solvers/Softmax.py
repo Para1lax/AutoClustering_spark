@@ -4,7 +4,6 @@ from numpy.random import choice
 import Constants
 import Metric
 from mab_solvers.MabSolver import MabSolver
-from RLthreadBase import ClusteringArmThread
 
 
 class Softmax(MabSolver):

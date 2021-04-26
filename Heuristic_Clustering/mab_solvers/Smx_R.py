@@ -1,12 +1,6 @@
-import sys
-
 import numpy as np
-from numpy.random import choice
 
 import Constants
-import Metric
-from mab_solvers.MabSolver import MabSolver
-from RLthreadBase import ClusteringArmThread
 from mab_solvers.Softmax import Softmax
 
 
