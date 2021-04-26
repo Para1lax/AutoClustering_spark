@@ -1,25 +1,8 @@
-# import threading
-#
-# import numpy as np
-# from ConfigSpace.conditions import InCondition
-# from ConfigSpace.hyperparameters import CategoricalHyperparameter, \
-#     UniformFloatHyperparameter, UniformIntegerHyperparameter
-# from sklearn.cluster import AffinityPropagation
-# from sklearn.cluster import AgglomerativeClustering
-# from sklearn.cluster import DBSCAN
-# from sklearn.cluster import KMeans
-# from sklearn.cluster import MeanShift, estimate_bandwidth
-# from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
-# from smac.configspace import ConfigurationSpace
-# from customsmac.smac_facade import SMAC
 from customsmac.psmac_facade import PSMAC
 from smac.scenario.scenario import Scenario
 
-import Constants
-import Metric
 from ClusteringArmThread import ClusteringArmThread
-# from customsmac.ei_optimization import InterleavedLocalAndRandomSearch
-# from customsmac.smbo import SMBO
+
 
 
 class RLthread(ClusteringArmThread):

@@ -1,11 +1,5 @@
-import math
-
 import numpy as np
 
-import Constants
-import Metric
-from mab_solvers.MabSolver import MabSolver
-from RLthreadBase import ClusteringArmThread
 from mab_solvers.Softmax import Softmax
 from mab_solvers.UCB import UCB
 

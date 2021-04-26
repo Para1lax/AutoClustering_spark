@@ -1,25 +1,11 @@
 # UP TO SPARK
 
 import time
-from os import walk
-from sys import argv
-
 import numpy as np
-# import pandas as pd
 
-import RLsmacAlgoEx as ae
 import Constants
-import utils
-from mab_solvers.MaxEiSolver import MaxEi
 from RLrfAlgoEx import RLrfAlgoEx
-from RLsmacEiAlgoEx import RLsmacEiAlgoEx
-from mab_solvers.Smx_R import SoftmaxR
-from mab_solvers.Smx_SRSU import SoftmaxSRSU
-from mab_solvers.UCB import UCB
-from mab_solvers.Softmax import Softmax
 from mab_solvers.UCB_SRSU import UCBsrsu
-from mab_solvers.UCB_SRU import UCBsru
-from mab_solvers.Uniform import Uniform
 
 
 # arglabel = None
