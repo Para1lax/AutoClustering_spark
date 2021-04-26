@@ -17,7 +17,7 @@ from smac.scenario.scenario import Scenario
 
 import Constants
 import Metric
-from RLthreadBase import ClusteringArmThread
+from ClusteringArmThread import ClusteringArmThread
 # from customsmac.ei_optimization import InterleavedLocalAndRandomSearch
 # from customsmac.smbo import SMBO
 
