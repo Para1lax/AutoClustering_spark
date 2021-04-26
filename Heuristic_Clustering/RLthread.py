@@ -12,7 +12,7 @@
 # from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
 # from smac.configspace import ConfigurationSpace
 # from customsmac.smac_facade import SMAC
-from smac.facade.experimental.psmac_facade import PSMAC
+from customsmac.psmac_facade import PSMAC
 from smac.scenario.scenario import Scenario
 
 import Constants

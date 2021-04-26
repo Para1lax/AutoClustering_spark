@@ -25,18 +25,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2191cc68-8308-4c32-accb-e446882f7db8" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/Heuristic_Clustering/customsmac/psmac_facade.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CVI_Predictor/.idea/workspace.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Heuristic_Clustering/.ipynb_checkpoints/working_notebook-checkpoint.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Heuristic_Clustering/RLsmacAlgoEx.py" beforeDir="false" afterPath="$PROJECT_DIR$/Heuristic_Clustering/RLsmacAlgoEx.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Heuristic_Clustering/RLthread.py" beforeDir="false" afterPath="$PROJECT_DIR$/Heuristic_Clustering/RLthread.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Heuristic_Clustering/RLthreadBase.py" beforeDir="false" afterPath="$PROJECT_DIR$/Heuristic_Clustering/ClusteringArmThread.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Heuristic_Clustering/RLthreadRFRS.py" beforeDir="false" afterPath="$PROJECT_DIR$/Heuristic_Clustering/RLthreadRFRS.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -103,7 +105,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1619392393081</updated>
-      <workItem from="1619392394445" duration="2228000" />
+      <workItem from="1619392394445" duration="3146000" />
     </task>
     <servers />
   </component>
