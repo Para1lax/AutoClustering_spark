@@ -9,29 +9,31 @@ import typing
 from ConfigSpace import Configuration
 from ConfigSpace.util import get_one_exchange_neighbourhood
 from smac.configspace import convert_configurations_to_array
-from smac.optimizer.objective import average_cost
+# from smac.optimizer.objective import average_cost
 from smac.runhistory.runhistory import RunHistory
 from smac.runhistory.runhistory2epm import RunHistory2EPM4Cost
 from smac.scenario.scenario import Scenario
-
-from smac.tae.execute_ta_run import StatusType, ExecuteTARun
+from smac.tae import StatusType
+from smac.tae.execute_ta_run_old import ExecuteTARunOld
 from sklearn.ensemble import RandomForestRegressor
 
+import Constants
 
 class RFRS(object):
     def __init__(self,
                  scenario: Scenario,
-                 tae_runner: typing.Union[ExecuteTARun, typing.Callable],
+                 tae_runner: typing.Union[ExecuteTARunOld, typing.Callable],
                  expansion_number=5000,
                  batch_size=1):
 
         self.rng = np.random.RandomState(seed=np.random.randint(10000))
-        aggregate_func = average_cost
+        # already in runhistory
+        # aggregate_func = average_cost
         num_params = len(scenario.cs.get_hyperparameters())
 
         self.scenario = scenario
         self.config_space = scenario.cs
-        self.runhistory = RunHistory(aggregate_func=aggregate_func)
+        self.runhistory = RunHistory()
         self.rh2EPM = RunHistory2EPM4Cost(scenario=scenario, num_params=num_params,
                                           success_states=[
                                               StatusType.SUCCESS,
@@ -63,6 +65,9 @@ class RFRS(object):
         while processed < self.batch_size:
             # New configuration generation:
             X, Y = self.rh2EPM.transform(self.runhistory)
+            if Constants.DEBUG:
+                print('======================RFRS -> optimize======================')
+                print(' -> X: {}\n{} \n -> Y: {}\n{}'.fotmat(type(X), X, type(Y), Y))
 
             # get all found configurations sorted according to acq
             challengers = self.choose_next(X, Y)

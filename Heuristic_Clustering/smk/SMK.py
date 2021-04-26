@@ -49,7 +49,7 @@ def sm(n, m, data, metric, k = 1):
         qi = sys.float_info.max
         for i in range(0, k):
             th = ClusteringArmThread(algo, metric, X)
-            cfg = th.clu_cs.sample_configuration()
+            cfg = th.configuration_space.sample_configuration()
             try:
                 qi = min(qi, th.clu_run(cfg))
             except:

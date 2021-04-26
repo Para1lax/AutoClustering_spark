@@ -28,7 +28,7 @@ class ClusteringArmThread:
         self.value = Constants.bad_cluster
         self.parameters = dict()
         self.seed = seed
-        self.clu_cs = ConfigurationSpace()
+        self.configuration_space = ConfigurationSpace()
 
         if (name == Constants.kmeans_algo):
             algorithm = CategoricalHyperparameter("algorithm", ["auto", "full", "elkan"])
@@ -37,20 +37,20 @@ class ClusteringArmThread:
             n_init = UniformIntegerHyperparameter("n_init", 2, 15)
             max_iter = UniformIntegerHyperparameter("max_iter", 50, 1500)
             verbose = Constant("verbose", 0)
-            self.clu_cs.add_hyperparameters([n_clusters, n_init, max_iter, tol, verbose, algorithm])
+            self.configuration_space.add_hyperparameters([n_clusters, n_init, max_iter, tol, verbose, algorithm])
 
         elif (name == Constants.affinity_algo):
             damping = UniformFloatHyperparameter("damping", 0.5, 1.0)
             max_iter = UniformIntegerHyperparameter("max_iter", 100, 1000)
             convergence_iter = UniformIntegerHyperparameter("convergence_iter", 5, 20)
-            self.clu_cs.add_hyperparameters([damping, max_iter, convergence_iter])
+            self.configuration_space.add_hyperparameters([damping, max_iter, convergence_iter])
 
         elif (name == Constants.mean_shift_algo):
             quantile = UniformFloatHyperparameter("quantile", 0.0, 1.0)
             bin_seeding = UniformIntegerHyperparameter("bin_seeding", 0, 1)
             min_bin_freq = UniformIntegerHyperparameter("min_bin_freq", 1, 100)
             cluster_all = UniformIntegerHyperparameter("cluster_all", 0, 1)
-            self.clu_cs.add_hyperparameters([quantile, bin_seeding, min_bin_freq, cluster_all])
+            self.configuration_space.add_hyperparameters([quantile, bin_seeding, min_bin_freq, cluster_all])
 
         elif (name == Constants.ward_algo):
             linkage = CategoricalHyperparameter("linkage", ["ward", "complete", "average"])
@@ -58,9 +58,9 @@ class ClusteringArmThread:
                                                      ["euclidean", "l1", "l2", "manhattan", "cosine", "precomputed"])
             affinity_ward = CategoricalHyperparameter("affinity_w", ["euclidean"])
             n_clusters = UniformIntegerHyperparameter("n_clusters", 2, 15)
-            self.clu_cs.add_hyperparameters([n_clusters, affinity_all, affinity_ward, linkage])
-            self.clu_cs.add_condition(InCondition(child=affinity_ward, parent=linkage, values=["ward"]))
-            self.clu_cs.add_condition(
+            self.configuration_space.add_hyperparameters([n_clusters, affinity_all, affinity_ward, linkage])
+            self.configuration_space.add_condition(InCondition(child=affinity_ward, parent=linkage, values=["ward"]))
+            self.configuration_space.add_condition(
                 InCondition(child=affinity_all, parent=linkage, values=["ward", "complete", "average"]))
 
         elif (name == Constants.dbscan_algo):
@@ -68,7 +68,7 @@ class ClusteringArmThread:
             eps = UniformFloatHyperparameter("eps", 0.1, 0.9)
             min_samples = UniformIntegerHyperparameter("min_samples", 2, 10)
             leaf_size = UniformIntegerHyperparameter("leaf_size", 5, 100)
-            self.clu_cs.add_hyperparameters([eps, min_samples, algorithm, leaf_size])
+            self.configuration_space.add_hyperparameters([eps, min_samples, algorithm, leaf_size])
 
         elif (name == Constants.gm_algo):
             cov_t = CategoricalHyperparameter("covariance_type", ["full", "tied", "diag", "spherical"])
@@ -76,7 +76,7 @@ class ClusteringArmThread:
             reg_c = UniformFloatHyperparameter("reg_covar", 1e-10, 0.1)
             n_com = UniformIntegerHyperparameter("n_components", 2, 15)
             max_iter = UniformIntegerHyperparameter("max_iter", 10, 1000)
-            self.clu_cs.add_hyperparameters([cov_t, tol, reg_c, n_com, max_iter])
+            self.configuration_space.add_hyperparameters([cov_t, tol, reg_c, n_com, max_iter])
 
         elif (name == Constants.bgm_algo):
             cov_t = CategoricalHyperparameter("covariance_type", ["full", "tied", "diag", "spherical"])
@@ -86,7 +86,7 @@ class ClusteringArmThread:
             mpp = UniformFloatHyperparameter("mean_precision_prior", 1e-10, 0.1)
             n_com = UniformIntegerHyperparameter("n_components", 2, 15)
             max_iter = UniformIntegerHyperparameter("max_iter", 10, 1000)
-            self.clu_cs.add_hyperparameters([wcp, mpp, cov_t, tol, reg_c, n_com, max_iter])
+            self.configuration_space.add_hyperparameters([wcp, mpp, cov_t, tol, reg_c, n_com, max_iter])
 
     def cluster(self, cfg):
         cl = None
