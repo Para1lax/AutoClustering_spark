@@ -13,8 +13,8 @@ from sklearn.cluster import KMeans
 from sklearn.cluster import MeanShift, estimate_bandwidth
 from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
 from smac.configspace import ConfigurationSpace
-from smac.facade.smac_facade import SMAC
-from smac.scenario.scenario import Scenario
+# from smac.facade.smac_facade import SMAC
+# from smac.scenario.scenario import Scenario
 
 import Constants
 import Metric
