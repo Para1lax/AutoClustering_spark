@@ -135,9 +135,12 @@ class RFRS(object):
         return [(predictions[ind], configs[ind]) for ind in indices[::-1]]
 
     def update_min(self, cur_min):
-        self.last_turn_min = cur_min
-        for old_val in self.runhistory.cost_per_config.values():
-            self.last_turn_min = min(old_val, self.last_turn_min)
+        # Updates the lowest empirical cost for a configuration, across all runs (budgets)
+
+        # self.last_turn_min = cur_min
+        # for old_val in self.runhistory.cost_per_config.values():
+        #     self.last_turn_min = min(old_val, self.last_turn_min)
+        self.last_turn_min = min(cur_min, self.runhistory.get_min_cost())
 
     def get_by_local_search(self, num):
         if self.runhistory.empty():
