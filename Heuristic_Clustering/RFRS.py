@@ -67,7 +67,7 @@ class RFRS(object):
             X, Y = self.rh2EPM.transform(self.runhistory)
             if Constants.DEBUG:
                 print('======================RFRS -> optimize======================')
-                print(' -> X: {}\n{} \n -> Y: {}\n{}'.fotmat(type(X), X, type(Y), Y))
+                print(' -> X: {}\n{} \n -> Y: {}\n{}'.format(type(X), X, type(Y), Y))
 
             # get all found configurations sorted according to acq
             challengers = self.choose_next(X, Y)
