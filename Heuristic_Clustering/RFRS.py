@@ -137,9 +137,8 @@ class RFRS(object):
     def update_min(self, cur_min):
         # Updates the lowest empirical cost for a configuration, across all runs (budgets)
 
-        self.last_turn_min = cur_min
-        for old_val in self.runhistory.cost_per_config.values():
-            self.last_turn_min = min(old_val, self.last_turn_min)
+        configs = self.runhistory.get_all_configs()
+        self.last_turn_min = min([self.runhistory.get_min_cost(conf) for conf in configs])
         # self.last_turn_min = min(cur_min, self.runhistory.get_min_cost())
 
     def get_by_local_search(self, num):
