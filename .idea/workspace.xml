@@ -24,10 +24,7 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2191cc68-8308-4c32-accb-e446882f7db8" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Heuristic_Clustering/RFRS.py" beforeDir="false" afterPath="$PROJECT_DIR$/Heuristic_Clustering/RFRS.py" afterDir="false" />
-    </list>
+    <list default="true" id="2191cc68-8308-4c32-accb-e446882f7db8" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -116,7 +113,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1619392393081</updated>
-      <workItem from="1619392394445" duration="13899000" />
+      <workItem from="1619392394445" duration="14569000" />
     </task>
     <servers />
   </component>
