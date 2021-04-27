@@ -110,7 +110,7 @@ class RFRS(object):
 
         return next_configs_by_acq_value
 
-    def expand(self):
+    def expand(self) -> [Configuration]:
         configs = self.config_space.sample_configuration(size=self.expansion_number - 10)
         for i in range(len(configs)):
             configs[i].origin = 'Random Search'
@@ -137,10 +137,10 @@ class RFRS(object):
     def update_min(self, cur_min):
         # Updates the lowest empirical cost for a configuration, across all runs (budgets)
 
-        # self.last_turn_min = cur_min
-        # for old_val in self.runhistory.cost_per_config.values():
-        #     self.last_turn_min = min(old_val, self.last_turn_min)
-        self.last_turn_min = min(cur_min, self.runhistory.get_min_cost())
+        self.last_turn_min = cur_min
+        for old_val in self.runhistory.cost_per_config.values():
+            self.last_turn_min = min(old_val, self.last_turn_min)
+        # self.last_turn_min = min(cur_min, self.runhistory.get_min_cost())
 
     def get_by_local_search(self, num):
         if self.runhistory.empty():
