@@ -138,6 +138,16 @@ class RFRS(object):
         # Updates the lowest empirical cost for a configuration, across all configs
 
         configs = self.runhistory.get_all_configs()
+        if Constants.DEBUG:
+            configs_el = configs[0]
+            min_cost = self.runhistory.get_min_cost(configs_el)
+            print('======================RFRS -> update_min======================')
+            print(' -> configs: {}\n{} \n -> configs_el: {}\n{} -> cur_min: {}\n{} -> get_min_cost: {}\n{}'\
+                  .format(type(configs), configs,\
+                          type(configs_el), configs_el,\
+                          type(cur_min), cur_min,\
+                          type(min_cost), min_cost))
+            
         self.last_turn_min = min(cur_min, *[self.runhistory.get_min_cost(conf) for conf in configs])
 
     def get_by_local_search(self, num):
