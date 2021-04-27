@@ -25,13 +25,13 @@ class RLthreadRFRS(ClusteringArmThread):
         # but sometimes it's guarding from hanging arbitraty long in single iteration
         if remaining_time is None:
             self.clu_scenario = Scenario({"run_obj": "quality",
-                                          "cs": self.clu_cs,
+                                          "cs": self.configuration_space,
                                           "deterministic": "true",
                                           "runcount-limit": self.run_count * c
                                           })
         else:
             self.clu_scenario = Scenario({"run_obj": "quality",
-                                          "cs": self.clu_cs,
+                                          "cs": self.configuration_space,
                                           "deterministic": "true",
                                           "tuner-timeout": remaining_time,
                                           "wallclock_limit": remaining_time,

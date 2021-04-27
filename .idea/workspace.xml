@@ -25,11 +25,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2191cc68-8308-4c32-accb-e446882f7db8" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/Heuristic_Clustering/mab_solvers/Smx_R.py" beforeDir="false" afterPath="$PROJECT_DIR$/Heuristic_Clustering/mab_solvers/Smx_R.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Heuristic_Clustering/mab_solvers/Smx_SRSU.py" beforeDir="false" afterPath="$PROJECT_DIR$/Heuristic_Clustering/mab_solvers/Smx_SRSU.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Heuristic_Clustering/mab_solvers/Softmax.py" beforeDir="false" afterPath="$PROJECT_DIR$/Heuristic_Clustering/mab_solvers/Softmax.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Heuristic_Clustering/mab_solvers/UCB_SRU.py" beforeDir="false" afterPath="$PROJECT_DIR$/Heuristic_Clustering/mab_solvers/UCB_SRU.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Heuristic_Clustering/mab_solvers/Uniform.py" beforeDir="false" afterPath="$PROJECT_DIR$/Heuristic_Clustering/mab_solvers/Uniform.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -119,7 +115,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1619392393081</updated>
-      <workItem from="1619392394445" duration="9580000" />
+      <workItem from="1619392394445" duration="10609000" />
     </task>
     <servers />
   </component>
