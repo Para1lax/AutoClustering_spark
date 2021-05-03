@@ -1,6 +1,8 @@
 from sys import float_info
 
-DEBUG=True
+DEBUG = False
+
+n_clusters_upper_bound = 15
 
 kmeans_algo = "KMeans"
 affinity_algo = "Affinity_Propagation"
@@ -61,7 +63,7 @@ proj_root = '~/WORK/MultiClustering/'
 experiment_path = 'datasets/normalized/'
 unified_data_path = 'datasets/unified/'
 
-bad_cluster = float_info.max  # 100.0
+bad_cluster = float_info.max
 in_reward = 1000.0
 best_init = 1000000000.0
 
@@ -99,6 +101,8 @@ algos = [
     gm_algo,
     bgm_algo
 ]
+
+rewrited = [kmeans_algo]
 
 noisy = False
 

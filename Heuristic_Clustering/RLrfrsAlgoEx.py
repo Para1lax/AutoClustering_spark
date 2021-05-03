@@ -48,7 +48,7 @@ class RLrfrsAlgoEx:
         if reward < self.best_val:
             self.best_val = reward
             self.best_param = clustering_thread.parameters
-            self.best_algo = clustering_thread.thread_name
+            self.best_algo = clustering_thread.algorithm_name
         log_string = str(iteration_number) \
                      + ', ' + self.metric \
                      + ', ' + str(self.best_val) \

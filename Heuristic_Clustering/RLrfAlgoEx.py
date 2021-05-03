@@ -27,7 +27,8 @@ class RLrfAlgoEx:
         # TODO: change RLthreadRFRS
         for i in range(0, Constants.num_algos):
             self.th.append(
-                RLthreadRFRS(self.data, self.clu_algos[i], self.metric, self.seed, self.batch_size, expansion=expansion))
+                RLthreadRFRS(data=self.data, algorithm_name=self.clu_algos[i],\
+                             metric=self.metric, seed=self.seed, batch_size=self.batch_size, expansion=expansion))
             self.optimizers.append(self.th[i].optimizer)
 
         self.rf = RandomForestRegressor(n_estimators=1000, random_state=42)
@@ -48,7 +49,7 @@ class RLrfAlgoEx:
         if reward < self.best_val:
             self.best_val = reward
             self.best_param = th.parameters
-            self.best_algo = th.thread_name
+            self.best_algo = th.algorithm_name
         log_string = str(iteration_number) \
                      + ', ' + self.metric \
                      + ', ' + str(self.best_val) \

@@ -19,6 +19,7 @@ from sklearn.ensemble import RandomForestRegressor
 
 import Constants
 
+
 class RFRS(object):
     def __init__(self,
                  scenario: Scenario,
@@ -64,6 +65,8 @@ class RFRS(object):
 
         while processed < self.batch_size:
             # New configuration generation:
+            # X (numpy.ndarray) – configuration vector x instance features
+            # Y (numpy.ndarray) – cost values
             X, Y = self.rh2EPM.transform(self.runhistory)
             if Constants.DEBUG:
                 print('======================RFRS -> optimize======================')
@@ -93,10 +96,10 @@ class RFRS(object):
 
         return self.incumbent
 
-    def choose_next(self, X: np.ndarray, Y: np.ndarray):
+    def choose_next(self, configuration_vector: np.ndarray, cost_values: np.ndarray):
 
-        if len(Y) != 0:
-            self.model.fit(X, Y.ravel())
+        if len(cost_values) != 0:
+            self.model.fit(configuration_vector, cost_values.ravel())
 
         weighted_challengers = self.expand()
 
@@ -139,9 +142,9 @@ class RFRS(object):
 
         configs = self.runhistory.get_all_configs()
         if configs:
-          self.last_turn_min = min(cur_min, *[self.runhistory.get_min_cost(conf) for conf in configs])
+            self.last_turn_min = min(cur_min, *[self.runhistory.get_min_cost(conf) for conf in configs])
         else:
-          self.last_turn_min = cur_min
+            self.last_turn_min = cur_min
 
     def get_by_local_search(self, num):
         if self.runhistory.empty():
