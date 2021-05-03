@@ -39,7 +39,7 @@ class RLthreadRFRS(ClusteringArmThread):
                                           })
 
     def run(self):
-        print('Run RFRS ' + self.thread_name)
+        print('Run RFRS ' + self.algorithm_name)
 
         self.parameters = self.optimizer.optimize()
         self.value = self.optimizer.get_runhistory().get_cost(self.parameters)
