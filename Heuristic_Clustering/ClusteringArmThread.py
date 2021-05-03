@@ -6,7 +6,6 @@ import sys
 from ConfigSpace.conditions import InCondition
 from ConfigSpace.hyperparameters import CategoricalHyperparameter, \
     UniformFloatHyperparameter, UniformIntegerHyperparameter, Constant
-from pyspark.ml.feature import OneHotEncoder, StringIndexer, VectorAssembler, Normalizer
 from sklearn.cluster import KMeans as KMeans_spark
 from sklearn.cluster import AffinityPropagation
 from sklearn.cluster import AgglomerativeClustering
