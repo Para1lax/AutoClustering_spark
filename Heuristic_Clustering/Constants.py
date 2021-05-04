@@ -1,6 +1,6 @@
 from sys import float_info
 
-DEBUG = False
+DEBUG = True
 
 n_clusters_upper_bound = 15
 
@@ -104,7 +104,7 @@ metrics = [
     c_ind_metric  # 20
 ]
 
-rewrited = [kmeans_algo, gm_algo]
+rewrited = [kmeans_algo, gm_algo, bisecting_kmeans]
 
 noisy = False
 

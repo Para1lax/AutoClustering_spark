@@ -77,7 +77,7 @@ class Softmax(MabSolver):
     def softmax_normalize(rewards):
         x = rewards
         if Constants.DEBUG:
-            print('-----Softmax.py-----\nx: {}\nnp.linalg.norm(x): {}'.format(x, np.linalg.norm(x)))
+            print('\n\n\n-----Softmax.py-----\nx: {}\nnp.linalg.norm(x): {}\n\n\n'.format(type(x), np.linalg.norm(x)))
         x = x / np.linalg.norm(x)
         e_x = np.exp(x - np.max(x))
         s_max = e_x / e_x.sum(axis=0)
