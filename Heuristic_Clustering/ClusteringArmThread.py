@@ -6,18 +6,17 @@ import sys
 from ConfigSpace.conditions import InCondition
 from ConfigSpace.hyperparameters import CategoricalHyperparameter, \
     UniformFloatHyperparameter, UniformIntegerHyperparameter, Constant
-from sklearn.cluster import KMeans as KMeans_spark
+from sklearn.cluster import KMeans
 from sklearn.cluster import AffinityPropagation
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.cluster import DBSCAN
 # from sklearn.cluster import KMeans
-from pyspark.ml.clustering import KMeans
+from pyspark.ml.clustering import KMeans as KMeans_spark
+from pyspark.ml.clustering import GaussianMixture as GaussianMixture_spark
 from sklearn.cluster import MeanShift, estimate_bandwidth
 from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
 from smac.configspace import ConfigurationSpace
 from pyspark.ml.feature import VectorAssembler
-from pyspark.ml.linalg import Vectors
-from pyspark.ml import Pipeline
 
 import Constants
 import Metric
@@ -75,12 +74,12 @@ class ClusteringArmThread:
             self.configuration_space.add_hyperparameters([eps, min_samples, algorithm, leaf_size])
 
         elif algorithm_name == Constants.gm_algo:
-            cov_t = CategoricalHyperparameter("covariance_type", ["full", "tied", "diag", "spherical"])
-            tol = UniformFloatHyperparameter("tol", 1e-6, 0.1)
-            reg_c = UniformFloatHyperparameter("reg_covar", 1e-10, 0.1)
-            n_com = UniformIntegerHyperparameter("n_components", 2, 15)
-            max_iter = UniformIntegerHyperparameter("max_iter", 10, 1000)
-            self.configuration_space.add_hyperparameters([cov_t, tol, reg_c, n_com, max_iter])
+            # cov_t = CategoricalHyperparameter("covariance_type", ["full", "tied", "diag", "spherical"])
+            # tol = UniformFloatHyperparameter("tol", 1e-6, 0.1)
+            # reg_c = UniformFloatHyperparameter("reg_covar", 1e-10, 0.1)
+            # n_com = UniformIntegerHyperparameter("n_components", 2, 15)
+            # max_iter = UniformIntegerHyperparameter("max_iter", 10, 1000)
+            self.configuration_space.add_hyperparameters(self.get_gaussian_mixture_configspace())
 
         elif algorithm_name == Constants.bgm_algo:
             cov_t = CategoricalHyperparameter("covariance_type", ["full", "tied", "diag", "spherical"])
@@ -115,7 +114,7 @@ class ClusteringArmThread:
         elif self.algorithm_name == Constants.dbscan_algo:
             model = DBSCAN(**configuration)
         elif self.algorithm_name == Constants.gm_algo:
-            model = GaussianMixture(**configuration)
+            model = GaussianMixture(predictionCol='labels', **configuration)
         elif self.algorithm_name == Constants.bgm_algo:
             model = BayesianGaussianMixture(**configuration)
 
@@ -136,10 +135,15 @@ class ClusteringArmThread:
                 del exc_info
                 return Constants.bad_cluster
 
-        if (self.algorithm_name == Constants.gm_algo) or (self.algorithm_name == Constants.bgm_algo):
+        if self.algorithm_name in Constants.rewrited:
+            predictions = model.transform(self.data)
+            # TODO: change to spark
+            labels = predictions.select('labels').toPandas()['labels']
+        elif (self.algorithm_name == Constants.gm_algo) or (self.algorithm_name == Constants.bgm_algo):
             labels = model.predict(self.data)
         else:
             labels = model.labels_
+
         return labels
 
     def clu_run(self, cfg):
@@ -149,15 +153,6 @@ class ClusteringArmThread:
         value = Metric.metric(self.data, n_clusters, labels, self.metric)
 
         return value
-
-    def get_kmeans_model(self, configuration: ConfigurationSpace) -> KMeans:
-        stages = []
-        if not 'features' in self.data.columns:
-            vectorAssembler = VectorAssembler(inputCols=self.data.columns,
-                                              outputCol="features")
-            stages.append(vectorAssembler)
-        kmeans = KMeans(featuresCol="features", predictionCol='labels', **configuration)
-
 
     @staticmethod
     def get_kmeans_configspace():
@@ -169,8 +164,10 @@ class ClusteringArmThread:
         maxIter : max number of iterations (>= 0)
         seed : random seed
         distanceMeasure : Supported options: 'euclidean' and 'cosine'.
+
+        Returns
         -----------------
-        Returns tuple of parameters
+        Tuple of parameters
         """
         k = UniformIntegerHyperparameter("k", 2, Constants.n_clusters_upper_bound)
         initMode = CategoricalHyperparameter("initMode", ['random', 'k-means||'])
@@ -178,3 +175,21 @@ class ClusteringArmThread:
         maxIter = UniformIntegerHyperparameter("maxIter", 5, 50)
         distanceMeasure = CategoricalHyperparameter("distanceMeasure", ['euclidean', 'cosine'])
         return k, initMode, initSteps, maxIter, distanceMeasure
+
+
+    @staticmethod
+    def get_gaussian_mixture_configspace():
+        """
+        k : number of clusters
+        aggregationDepth : suggested depth for treeAggregate (>= 2)
+        maxIter : max number of iterations (>= 0)
+        tol : the convergence tolerance for iterative algorithms (>= 0)
+
+        Returns
+        -------
+        Tuple of parameters
+        """
+        k = UniformIntegerHyperparameter("k", 2, Constants.n_clusters_upper_bound)
+        maxIter = UniformIntegerHyperparameter("maxIter", 5, 50)
+        tol = UniformFloatHyperparameter("tol", 1e-6, 0.1)
+        return k, maxIter, tol

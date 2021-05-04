@@ -75,7 +75,6 @@ class Softmax(MabSolver):
 
     @staticmethod
     def softmax_normalize(rewards):
-        print(abracadabra)
         x = rewards
         x = x / np.linalg.norm(x)
         e_x = np.exp(x - np.max(x))
