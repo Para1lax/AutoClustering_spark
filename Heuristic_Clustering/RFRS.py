@@ -68,9 +68,9 @@ class RFRS(object):
             # X (numpy.ndarray) – configuration vector x instance features
             # Y (numpy.ndarray) – cost values
             X, Y = self.rh2EPM.transform(self.runhistory)
-            if Constants.DEBUG:
-                print('======================RFRS -> optimize======================')
-                print(' -> X: {}\n{} \n -> Y: {}\n{}'.format(type(X), X, type(Y), Y))
+            # if Constants.DEBUG:
+            #     print('======================RFRS -> optimize======================')
+            #     print(' -> X: {}\n{} \n -> Y: {}\n{}'.format(type(X), X, type(Y), Y))
 
             # get all found configurations sorted according to acq
             challengers = self.choose_next(X, Y)
