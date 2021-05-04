@@ -1,18 +1,30 @@
 from sys import float_info
 
-DEBUG = True
+DEBUG = False
 
 n_clusters_upper_bound = 15
 
 kmeans_algo = "KMeans"
-affinity_algo = "Affinity_Propagation"
-mean_shift_algo = "Mean_Shift"
-ward_algo = "Ward"
-dbscan_algo = "DBSCAN"
+# affinity_algo = "Affinity_Propagation"
+# mean_shift_algo = "Mean_Shift"
+# ward_algo = "Ward"
+# dbscan_algo = "DBSCAN"
 gm_algo = "Gaussian_Mixture"
-bgm_algo = "Bayesian_Gaussian_Mixture"
+# bgm_algo = "Bayesian_Gaussian_Mixture"
+bisecting_kmeans = "BisectingKMeans"
 
-num_algos = 7
+num_algos = 3
+
+algos = [
+    kmeans_algo,
+    # affinity_algo,
+    # mean_shift_algo,
+    # ward_algo,
+    # dbscan_algo,
+    gm_algo,
+    # bgm_algo
+    bisecting_kmeans
+]
 
 # Metrica names can only consist of small english letters and dashes
 purity_metric = "purity"
@@ -92,17 +104,7 @@ metrics = [
     c_ind_metric  # 20
 ]
 
-algos = [
-    kmeans_algo,
-    affinity_algo,
-    mean_shift_algo,
-    ward_algo,
-    dbscan_algo,
-    gm_algo,
-    bgm_algo
-]
-
-rewrited = [kmeans_algo]
+rewrited = [kmeans_algo, gm_algo]
 
 noisy = False
 
