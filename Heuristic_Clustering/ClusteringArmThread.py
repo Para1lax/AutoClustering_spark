@@ -176,7 +176,6 @@ class ClusteringArmThread:
         distanceMeasure = CategoricalHyperparameter("distanceMeasure", ['euclidean', 'cosine'])
         return k, initMode, initSteps, maxIter, distanceMeasure
 
-
     @staticmethod
     def get_gaussian_mixture_configspace():
         """
