@@ -31,7 +31,7 @@ class UCB(MabSolver):
             labels[c] = c
         np.random.shuffle(labels)
         # TODO: rewrite Metric to Spark
-        res = Metric.metric(self.action.data.toPandas().values, n_clusters, labels, self.action.metric, true_labels)
+        res = Metric.metric(self.action.data)
 
         # start = time.time()
         for i in range(0, Constants.num_algos):
