@@ -44,7 +44,10 @@ global_trace = {}
 
 # TODO: change when more metrics arrived
 def metric(data):
-    return -ClusteringEvaluator(data, predictionCol='labels', distanceMeasure='squaredEuclidean')
+    try:
+        return -ClusteringEvaluator(data, predictionCol='labels', distanceMeasure='squaredEuclidean')
+    except TypeError:
+        print("\n\nTYPE ERROR OCCURED IN Metric.py:\n\nDATA: {}\n\n".format(data))
 
 
 def switch_and_call_metrics(X, labels, metric, n_clusters, true_labels=None):
