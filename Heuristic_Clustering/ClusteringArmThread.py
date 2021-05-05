@@ -44,7 +44,7 @@ class ClusteringArmThread:
         elif algorithm_name == Constants.bisecting_kmeans:
             self.configuration_space.add_hyperparameters(self.get_bisecting_kmeans_configspace())
 
-    def cluster(self, configuration):
+    def get_labels(self, configuration):
         model = None
         if self.algorithm_name == Constants.kmeans_algo:
             model = KMeans_spark(predictionCol='labels', **configuration)
@@ -75,8 +75,7 @@ class ClusteringArmThread:
 
         if self.algorithm_name in Constants.rewrited:
             predictions = model.transform(self.data)
-            # TODO: change to spark
-            labels = predictions.select('labels').toPandas()['labels']
+            labels = predictions
         # elif (self.algorithm_name == Constants.gm_algo) or (self.algorithm_name == Constants.bgm_algo):
         #     labels = model.predict(self.data)
         else:
@@ -85,12 +84,12 @@ class ClusteringArmThread:
         return labels
 
     def clu_run(self, cfg):
-        labels = self.cluster(cfg)
-        labels_unique = np.unique(labels)
-        n_clusters = len(labels_unique)
-        value = Metric.metric(self.data, n_clusters, labels, self.metric)
-
-        return value
+        labels = self.get_labels(cfg)
+        # labels_unique = np.unique(labels)
+        # n_clusters = len(labels_unique)
+        # value = Metric.metric(self.data, n_clusters, labels, self.metric)
+        # return value
+        return Metric.metric(self.data)
 
     @staticmethod
     def get_kmeans_configspace():
