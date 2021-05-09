@@ -55,7 +55,7 @@ def metric(data, **kwargs):
                DATA:   {}\n \
                RESULT: {}\n \
                \n \
-               ==========================".format(type(data), res))
+               ==========================".format(data.show(10), res))
         return res
     except TypeError:
         print("\n\nTYPE ERROR OCCURED IN Metric.py:\n\nDATA: {}\n\n".format(data))
