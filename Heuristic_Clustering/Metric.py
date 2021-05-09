@@ -43,6 +43,7 @@ global_trace = {}
 #     return value
 
 # TODO: change when more metrics arrived
+# TODO: delete prints when found where use metrics
 def metric(data, **kwargs):
     print("\n\n==========================\nMETRIC\n==========================\n\n")
     try:
