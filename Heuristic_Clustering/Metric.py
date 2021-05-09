@@ -43,9 +43,19 @@ global_trace = {}
 #     return value
 
 # TODO: change when more metrics arrived
-def metric(data):
+def metric(data, **kwargs):
+    print("\n\n==========================\nMETRIC\n==========================\n\n")
     try:
-        return -ClusteringEvaluator(data, predictionCol='labels', distanceMeasure='squaredEuclidean')
+        res = -ClusteringEvaluator(data, predictionCol='labels', distanceMeasure='squaredEuclidean')
+        print("==========================\n \
+               ==========================> METRIC <==========================\n \
+               ==========================\n \
+               \n \
+               DATA:   {}\n \
+               RESULT: {}\n \
+               \n \
+               ==========================".format(type(data), res))
+        return res
     except TypeError:
         print("\n\nTYPE ERROR OCCURED IN Metric.py:\n\nDATA: {}\n\n".format(data))
         return 0
