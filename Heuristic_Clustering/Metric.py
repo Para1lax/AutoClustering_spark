@@ -48,7 +48,7 @@ global_trace = {}
 def metric(data, **kwargs):
     debugging_printer(place='Metric.py', info_name='DATA', info=data.head())
     try:
-        res = -ClusteringEvaluator(data, predictionCol='labels', distanceMeasure='squaredEuclidean')
+        res = -ClusteringEvaluator(predictionCol='labels', distanceMeasure='squaredEuclidean').evaluate(data)
         return res
     except TypeError:
         print("\n\nTYPE ERROR OCCURED IN Metric.py:\n\nDATA: {}\n\n".format(data))
