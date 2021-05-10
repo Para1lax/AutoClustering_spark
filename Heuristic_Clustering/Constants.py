@@ -1,6 +1,7 @@
 from sys import float_info
 
-DEBUG = False
+DEBUG = True
+DEBUG_PREFIX = "=====> "
 
 n_clusters_upper_bound = 15
 

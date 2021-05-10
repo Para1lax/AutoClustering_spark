@@ -6,7 +6,7 @@ import numpy as np
 import Constants
 from RLrfAlgoEx import RLrfAlgoEx
 from mab_solvers.UCB_SRSU import UCBsrsu
-
+from utils import debugging_printer
 
 # arglabel = None
 # if len(argv) == 7:
@@ -76,10 +76,10 @@ def configure_mab_solver(data, seed=42, metric='sil', output_file='heuristic_clu
     Creates and configures the corresponding MAB-solver.
     :param algorithm: algorithm to be used.
     """
-
-    print("===============MAB_SOLVER===============")
+    debugging_printer("configure_mab_solver -> RLrfAlgoEx")
     # algorithm.startswith("rfrsls-ucb-SRSU"):
     algorithm_executor = RLrfAlgoEx(data=data, metric=metric, seed=seed, batch_size=batch_size, expansion=100)
+    debugging_printer("configure_mab_solver -> UCBsrsu")
     mab_solver = UCBsrsu(action=algorithm_executor, time_limit=time_limit)
 
     return mab_solver

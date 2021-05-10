@@ -1,3 +1,5 @@
+from Constants import DEBUG, DEBUG_PREFIX
+
 try:
     from pyspark import SparkContext, SparkConf
     from pyspark.sql import SparkSession
@@ -48,11 +50,16 @@ def pandas_to_spark(pandas_df):
     return sqlCtx.createDataFrame(pandas_df, p_schema)
 
 
-def debugging_printer(place, info_name, info):
-    print("==========================\n \
-           ==========================> {} <==========================\n \
-           ==========================\n \
-           \n \
-           {}:  \n{}\n \
-           \n \
-           ==========================".format(place, info_name, info))
+def debugging_printer(place, info_name=None, info=None):
+    if not DEBUG:
+        return
+
+    if info is None:
+        print("{}{}".format(DEBUG_PREFIX, place))
+    else:
+        print("\n \
+               ==========================> {} <==========================\n \
+               \n \
+               {}:  \n{}\n \
+               \n \
+               ==========================".format(place, info_name, info))
