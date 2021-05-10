@@ -23,13 +23,7 @@ class ClusteringArmThread:
     def __init__(self, data, algorithm_name, metric, seed):
         self.algorithm_name = algorithm_name
         self.metric = metric
-        if algorithm_name in Constants.rewrited:
-            self.data = data
-            vector_assembler = VectorAssembler(inputCols=self.data.columns,
-                                               outputCol="features")
-            self.data = vector_assembler.transform(self.data)
-        else:
-            self.data = data.toPandas().values
+        self.data = data
         debugging_printer(place="ClusteringArmThread.__init__", info_name="DATA", info=data.head())
         self.value = Constants.bad_cluster
         self.parameters = dict()

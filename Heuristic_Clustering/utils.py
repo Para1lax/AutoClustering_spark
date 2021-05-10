@@ -13,8 +13,17 @@ spark = SparkSession \
 
 from pyspark.sql.types import *
 from pyspark.sql import SQLContext
+from pyspark.ml.feature import OneHotEncoder, StringIndexer, VectorAssembler, Normalizer
 
 sqlCtx = SQLContext(sc)
+
+
+#preprocessing data for spark
+# TODO: OneHotEncoder, StringIndexer (maybe)
+def preprocess(data):
+    vectorAssembler = VectorAssembler(inputCols=data.columns,
+                                      outputCol="features")
+    return vectorAssembler.transform(data)
 
 
 # Auxiliar functions

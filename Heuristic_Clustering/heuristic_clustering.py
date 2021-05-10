@@ -6,7 +6,7 @@ import numpy as np
 import Constants
 from RLrfAlgoEx import RLrfAlgoEx
 from mab_solvers.UCB_SRSU import UCBsrsu
-from utils import debugging_printer
+from utils import debugging_printer, preprocess
 
 # arglabel = None
 # if len(argv) == 7:
@@ -67,7 +67,6 @@ from utils import debugging_printer
 #
 #     return mab_solver
 
-
 # checking rfrsls-ucb-SRSU only
 def configure_mab_solver(data, seed=42, metric='sil', output_file='heuristic_clustering_output', \
                          algorithm=Constants.algorithm, batch_size=Constants.batch_size, \
@@ -100,6 +99,11 @@ def run(spark_df, seed=42, metric='sil', output_file='heuristic_clustering_outpu
     # X = np.array(data, dtype=np.double)  # change to spark df
     f = open(file=output_file, mode='a')
 
+    print("DF before preproc")
+    spark_df.show(10)
+    spark_df = preprocess(spark_df)
+    print("DF after preproc")
+    spark_df.show(10)
     # core part:
     # initializing multi-arm bandit solver:
     mab_solver = configure_mab_solver(spark_df, algorithm=algorithm, metric=metric, seed=seed)
