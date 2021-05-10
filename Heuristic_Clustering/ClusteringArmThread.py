@@ -16,11 +16,12 @@ from pyspark.ml.feature import VectorAssembler
 
 import Constants
 import Metric
-
+from utils import debugging_printer
 
 class ClusteringArmThread:
 
     def __init__(self, data, algorithm_name, metric, seed):
+        debugging_printer(place="ClusteringArmThread.__init__", info_name="DATA", info=data.show(10))
         self.algorithm_name = algorithm_name
         self.metric = metric
         if algorithm_name in Constants.rewrited:
