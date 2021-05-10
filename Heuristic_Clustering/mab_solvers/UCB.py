@@ -1,10 +1,13 @@
 import math
 
 import numpy as np
+from pyspark.sql.functions import *
+from pyspark.sql.types import IntegerType
 
 import Constants
 import Metric
 from mab_solvers.MabSolver import MabSolver
+from utils import debugging_printer
 
 
 class UCB(MabSolver):
@@ -25,13 +28,22 @@ class UCB(MabSolver):
         gained by calculating metrics on randomly assigned labels.
         """
         print("\nInit UCB1")
-        n_clusters = 15
-        labels = np.random.randint(0, n_clusters, self.action.data.count())
-        for c in range(0, n_clusters):
-            labels[c] = c
-        np.random.shuffle(labels)
+        # labels = np.random.randint(0, n_clusters, self.action.data.count())
+        # for c in range(0, n_clusters):
+        #     labels[c] = c
+        # np.random.shuffle(labels)
+
+        # Random initialization of cluster labels
+        self.action.data = self.action.data.withColumn('labels', round(rand()*Constants.n_clusters_upper_bound).cast(IntegerType()))
+
+        debugging_printer(place='UCB.py -> initialize', info_name='Data after random initialization',
+                          info=self.action.data.head())
+        # TODO: delete show
+        self.action.data.show(10)
         # TODO: rewrite Metric to Spark
         res = Metric.metric(self.action.data)
+        debugging_printer(place='UCB.py -> initialize', info_name='Type of result of metric',
+                          info=type(res))
 
         # start = time.time()
         for i in range(0, Constants.num_algos):
