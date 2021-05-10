@@ -3,6 +3,8 @@ import numpy as np
 from mab_solvers.Softmax import Softmax
 from mab_solvers.UCB import UCB
 
+from utils import debugging_printer
+
 s_norm = Softmax.softmax_normalize
 
 
@@ -19,14 +21,5 @@ class UCBsrsu(UCB):
         self.iter += 1
         self.n[arm] += 1
         self.raw_rewards[arm] = reward
-        # TODO : DELETE PRINT
-        print("==========================\n \
-               ==========================> UCB_SRSU -> register_action <==========================\n \
-               ==========================\n \
-               \n \
-               reward:   {}\n \
-               raw_rewards:   {}\n \
-               \n \
-               ==========================".format(reward, self.raw_rewards))
         self.rewards = s_norm(self.raw_rewards) + s_norm(self.u_correction(self.sum_spendings))
 

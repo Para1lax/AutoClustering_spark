@@ -10,6 +10,7 @@ from pyspark.ml.evaluation import ClusteringEvaluator
 from pulp import *
 
 import Constants
+from utils import debugging_printer
 
 # Performance measurements:
 global_trace = {}
@@ -45,17 +46,9 @@ global_trace = {}
 # TODO: change when more metrics arrived
 # TODO: delete prints when found where use metrics
 def metric(data, **kwargs):
-    print("\n\n==========================\nMETRIC\n==========================\n\n")
+    debugging_printer(place='Metric.py', info_name='DATA', info=data.show(10))
     try:
         res = -ClusteringEvaluator(data, predictionCol='labels', distanceMeasure='squaredEuclidean')
-        print("==========================\n \
-               ==========================> METRIC <==========================\n \
-               ==========================\n \
-               \n \
-               DATA:   {}\n \
-               RESULT: {}\n \
-               \n \
-               ==========================".format(data.show(10), res))
         return res
     except TypeError:
         print("\n\nTYPE ERROR OCCURED IN Metric.py:\n\nDATA: {}\n\n".format(data))

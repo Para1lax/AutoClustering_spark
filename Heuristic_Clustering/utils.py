@@ -14,18 +14,28 @@ from pyspark.sql import SQLContext
 
 sqlCtx = SQLContext(sc)
 
+
 # Auxiliar functions
 def equivalent_type(f):
-    if f == 'datetime64[ns]': return TimestampType()
-    elif f == 'int64': return LongType()
-    elif f == 'int32': return IntegerType()
-    elif f == 'float64': return FloatType()
-    else: return StringType()
+    if f == 'datetime64[ns]':
+        return TimestampType()
+    elif f == 'int64':
+        return LongType()
+    elif f == 'int32':
+        return IntegerType()
+    elif f == 'float64':
+        return FloatType()
+    else:
+        return StringType()
+
 
 def define_structure(string, format_type):
-    try: typo = equivalent_type(format_type)
-    except: typo = StringType()
+    try:
+        typo = equivalent_type(format_type)
+    except:
+        typo = StringType()
     return StructField(string, typo)
+
 
 # Given pandas dataframe, it will return a spark's dataframe.
 def pandas_to_spark(pandas_df):
@@ -33,6 +43,16 @@ def pandas_to_spark(pandas_df):
     types = list(pandas_df.dtypes)
     struct_list = []
     for column, typo in zip(columns, types):
-      struct_list.append(define_structure(column, typo))
+        struct_list.append(define_structure(column, typo))
     p_schema = StructType(struct_list)
     return sqlCtx.createDataFrame(pandas_df, p_schema)
+
+
+def debugging_printer(place, info_name, info):
+    print("==========================\n \
+           ==========================> {} <==========================\n \
+           ==========================\n \
+           \n \
+           {}:  \n{}\n \
+           \n \
+           ==========================".format(place, info_name, info))
