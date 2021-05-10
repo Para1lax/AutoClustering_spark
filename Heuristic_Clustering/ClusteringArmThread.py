@@ -21,7 +21,6 @@ from utils import debugging_printer
 class ClusteringArmThread:
 
     def __init__(self, data, algorithm_name, metric, seed):
-        debugging_printer(place="ClusteringArmThread.__init__", info_name="DATA", info=data.show(10))
         self.algorithm_name = algorithm_name
         self.metric = metric
         if algorithm_name in Constants.rewrited:
@@ -31,6 +30,7 @@ class ClusteringArmThread:
             self.data = vector_assembler.transform(self.data)
         else:
             self.data = data.toPandas().values
+        debugging_printer(place="ClusteringArmThread.__init__", info_name="DATA", info=data.head())
         self.value = Constants.bad_cluster
         self.parameters = dict()
         self.seed = seed
@@ -85,12 +85,9 @@ class ClusteringArmThread:
         return labels
 
     def clu_run(self, cfg):
-        labels = self.get_labels(cfg)
-        # labels_unique = np.unique(labels)
-        # n_clusters = len(labels_unique)
-        # value = Metric.metric(self.data, n_clusters, labels, self.metric)
-        # return value
-        return Metric.metric(self.data)
+        data_with_labels = self.get_labels(cfg)
+        debugging_printer("clu_run -> return Metric.metric(data_with_labels)")
+        return Metric.metric(data_with_labels)
 
     @staticmethod
     def get_kmeans_configspace():
