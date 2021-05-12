@@ -167,34 +167,34 @@ def launch(X):
         value = 1
         parameters = ""
         print('\n\n=============================\n\n{}\n\n=============================\n\n'.format(algo))
-        if Constants.kmeans_algo in algo:
+        if (Constants.kmeans_algo in algo):
             smac = SMAC(scenario=get_km_scenario(), rng=np.random.RandomState(42), tae_runner=km_run)
             parameters = smac.optimize()
             value = km_run(parameters)
             achieved_values[Constants.kmeans_algo] = value
-        elif Constants.affinity_algo in algo:
+        elif (Constants.affinity_algo in algo):
             smac = SMAC(scenario=get_aff_scenario(), rng=np.random.RandomState(42), tae_runner=aff_run)
             parameters = smac.optimize()
             value = aff_run(parameters)
             achieved_values[Constants.affinity_algo] = value
-        elif Constants.mean_shift_algo in algo:
+        elif (Constants.mean_shift_algo in algo):
             smac = SMAC(scenario=get_ms_scenario(), rng=np.random.RandomState(42), tae_runner=ms_run)
             parameters = smac.optimize()
             value = ms_run(parameters)
             achieved_values[Constants.mean_shift_algo] = value
-        elif Constants.ward_algo in algo:
+        elif (Constants.ward_algo in algo):
             smac = SMAC(scenario=get_w_scenario(), rng=np.random.RandomState(42), tae_runner=w_run)
             parameters = smac.optimize()
             value = w_run(parameters)
             achieved_values[Constants.ward_algo] = value
-        elif Constants.dbscan_algo in algo:
+        elif (Constants.dbscan_algo in algo):
             smac = SMAC(scenario=get_db_scenario(), rng=np.random.RandomState(42), tae_runner=db_run)
             parameters = smac.optimize()
             value = db_run(parameters)
             achieved_values[Constants.dbscan_algo] = value
         print(('For algo ' + algo + ' lowest function value found: %f' % value))
         print(('Parameter setting %s' % parameters))
-        if value < best_val:
+        if (value < best_val):
             best_val = value
             best_algo = algo
             best_params = parameters
@@ -206,24 +206,24 @@ def launch(X):
     chosen_algo = ""
     num_cases = 0
     for algo in algos.keys():
-        if algos[algo] > num_cases:
+        if (algos[algo] > num_cases):
             num_cases = algos[algo]
             chosen_algo = algo
 
     best_params = saved_parameters[num_parameters_for_algo[chosen_algo][0]]
     cl = ""
-    if Constants.kmeans_algo in chosen_algo:
+    if (Constants.kmeans_algo in chosen_algo):
         cl = KMeans(**best_params)
-    elif Constants.affinity_algo in chosen_algo:
+    elif (Constants.affinity_algo in chosen_algo):
         cl = AffinityPropagation(**best_params)
-    elif Constants.mean_shift_algo in chosen_algo:
+    elif (Constants.mean_shift_algo in chosen_algo):
         bandwidth = estimate_bandwidth(X, quantile=best_params["quantile"])
         cl = MeanShift(bandwidth=bandwidth, bin_seeding=bool(best_params["bin_seeding"]),
                        min_bin_freq=best_params["min_bin_freq"],
                        cluster_all=bool(best_params["cluster_all"]))
-    elif Constants.ward_algo in chosen_algo:
+    elif (Constants.ward_algo in chosen_algo):
         cl = AgglomerativeClustering(**best_params)
-    elif Constants.dbscan_algo in chosen_algo:
+    elif (Constants.dbscan_algo in chosen_algo):
         cl = DBSCAN(**best_params)
 
     cl.fit(X)

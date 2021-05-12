@@ -3,7 +3,7 @@ from sys import float_info
 import numpy as np
 
 import Constants
-import RLthreadBase as t
+import ClusteringArmThread as t
 
 
 class AlgorithmExecutor:
