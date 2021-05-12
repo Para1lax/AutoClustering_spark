@@ -1,11 +1,10 @@
 from sklearn import datasets
 import numpy as np
 import sys
-from sklearn.cluster import KMeans
-from sklearn.cluster import AffinityPropagation
-from sklearn.cluster import MeanShift, estimate_bandwidth
-from sklearn.cluster import AgglomerativeClustering
-from sklearn.cluster import DBSCAN
+from pyspark.ml.clustering import KMeans
+from pyspark.ml.clustering import GaussianMixture
+from pyspark.ml.clustering import BisectingKMeans
+from pyspark.ml.evaluation import ClusteringEvaluator
 
 # Import ConfigSpace and different types of parameters
 from smac.configspace import ConfigurationSpace
@@ -22,49 +21,21 @@ import Constants
 n_samples = 500
 
 # 3 easily observed clusters
-X, y = datasets.make_blobs(n_samples=n_samples, n_features=4, centers=3, cluster_std=1, center_box=(-10.0, 10.0),
-                           shuffle=True)
+# X, y = datasets.make_blobs(n_samples=n_samples, n_features=4, centers=3, cluster_std=1, center_box=(-10.0, 10.0),
+#                            shuffle=True)
 
 max_eval = 10
 metric = Constants.silhouette_metric
 
 
-def run(cl):
-    cl.fit(X)
-    labels = cl.labels_
-    # centers = cl.cluster_centers_
-    labels_unique = np.unique(labels)
-    n_clusters = len(labels_unique)
-    print("n_clusters = " + str(n_clusters))
-    m = Metric.metric(X, n_clusters, labels, metric)
-    print("metric = " + str(m))
-    return m
+def run(data, model):
+    model.fit(data)
+    predictions = model.transform(data)
+    return -ClusteringEvaluator(predictionCol='prediction', distanceMeasure='squaredEuclidean').evaluate(data)
 
 
 def km_run(cfg):
     cl = KMeans(**cfg)
-    return run(cl)
-
-
-def ms_run(cfg):
-    bandwidth = estimate_bandwidth(X, quantile=cfg['quantile'])
-    cl = MeanShift(bandwidth=bandwidth, bin_seeding=bool(cfg['bin_seeding']), min_bin_freq=cfg['min_bin_freq'],
-                   cluster_all=bool(cfg['cluster_all']))
-    return run(cl)
-
-
-def aff_run(cfg):
-    cl = AffinityPropagation(**cfg)
-    return run(cl)
-
-
-def w_run(cfg):
-    cl = AgglomerativeClustering(**cfg)
-    return run(cl)
-
-
-def db_run(cfg):
-    cl = DBSCAN(**cfg)
     return run(cl)
 
 
@@ -167,34 +138,34 @@ def launch(X):
         value = 1
         parameters = ""
         print('\n\n=============================\n\n{}\n\n=============================\n\n'.format(algo))
-        if (Constants.kmeans_algo in algo):
+        if Constants.kmeans_algo in algo:
             smac = SMAC(scenario=get_km_scenario(), rng=np.random.RandomState(42), tae_runner=km_run)
             parameters = smac.optimize()
             value = km_run(parameters)
             achieved_values[Constants.kmeans_algo] = value
-        elif (Constants.affinity_algo in algo):
+        elif Constants.affinity_algo in algo:
             smac = SMAC(scenario=get_aff_scenario(), rng=np.random.RandomState(42), tae_runner=aff_run)
             parameters = smac.optimize()
             value = aff_run(parameters)
             achieved_values[Constants.affinity_algo] = value
-        elif (Constants.mean_shift_algo in algo):
+        elif Constants.mean_shift_algo in algo:
             smac = SMAC(scenario=get_ms_scenario(), rng=np.random.RandomState(42), tae_runner=ms_run)
             parameters = smac.optimize()
             value = ms_run(parameters)
             achieved_values[Constants.mean_shift_algo] = value
-        elif (Constants.ward_algo in algo):
+        elif Constants.ward_algo in algo:
             smac = SMAC(scenario=get_w_scenario(), rng=np.random.RandomState(42), tae_runner=w_run)
             parameters = smac.optimize()
             value = w_run(parameters)
             achieved_values[Constants.ward_algo] = value
-        elif (Constants.dbscan_algo in algo):
+        elif Constants.dbscan_algo in algo:
             smac = SMAC(scenario=get_db_scenario(), rng=np.random.RandomState(42), tae_runner=db_run)
             parameters = smac.optimize()
             value = db_run(parameters)
             achieved_values[Constants.dbscan_algo] = value
         print(('For algo ' + algo + ' lowest function value found: %f' % value))
         print(('Parameter setting %s' % parameters))
-        if (value < best_val):
+        if value < best_val:
             best_val = value
             best_algo = algo
             best_params = parameters
@@ -206,24 +177,24 @@ def launch(X):
     chosen_algo = ""
     num_cases = 0
     for algo in algos.keys():
-        if (algos[algo] > num_cases):
+        if algos[algo] > num_cases:
             num_cases = algos[algo]
             chosen_algo = algo
 
     best_params = saved_parameters[num_parameters_for_algo[chosen_algo][0]]
     cl = ""
-    if (Constants.kmeans_algo in chosen_algo):
+    if Constants.kmeans_algo in chosen_algo:
         cl = KMeans(**best_params)
-    elif (Constants.affinity_algo in chosen_algo):
+    elif Constants.affinity_algo in chosen_algo:
         cl = AffinityPropagation(**best_params)
-    elif (Constants.mean_shift_algo in chosen_algo):
+    elif Constants.mean_shift_algo in chosen_algo:
         bandwidth = estimate_bandwidth(X, quantile=best_params["quantile"])
         cl = MeanShift(bandwidth=bandwidth, bin_seeding=bool(best_params["bin_seeding"]),
                        min_bin_freq=best_params["min_bin_freq"],
                        cluster_all=bool(best_params["cluster_all"]))
-    elif (Constants.ward_algo in chosen_algo):
+    elif Constants.ward_algo in chosen_algo:
         cl = AgglomerativeClustering(**best_params)
-    elif (Constants.dbscan_algo in chosen_algo):
+    elif Constants.dbscan_algo in chosen_algo:
         cl = DBSCAN(**best_params)
 
     cl.fit(X)
