@@ -141,8 +141,7 @@ class ClusteringArmThread:
         Tuple of parameters
         """
         k = UniformIntegerHyperparameter("k", 2, Constants.n_clusters_upper_bound)
-        initSteps = UniformIntegerHyperparameter("initSteps", 1, 5)
         maxIter = UniformIntegerHyperparameter("maxIter", 5, 50)
         distanceMeasure = CategoricalHyperparameter("distanceMeasure", ['euclidean', 'cosine'])
         minDivisibleClusterSize = UniformFloatHyperparameter("minDivisibleClusterSize", 0.01, 1.0)
-        return k, initSteps, maxIter, distanceMeasure, minDivisibleClusterSize
+        return k, maxIter, distanceMeasure, minDivisibleClusterSize
