@@ -18,6 +18,7 @@ class RLrfAlgoEx:
         self.run_num = np.array([0] * Constants.num_algos)
         self.best_val = Constants.best_init
         self.best_param = dict()
+        self.best_labels = None
         self.best_algo = ""
         self.seed = seed
         self.batch_size = batch_size
@@ -52,6 +53,7 @@ class RLrfAlgoEx:
             self.best_val = reward
             self.best_param = th.parameters
             self.best_algo = th.algorithm_name
+            self.best_labels = th.current_labels
         log_string = str(iteration_number) \
                      + ', ' + self.metric \
                      + ', ' + str(self.best_val) \

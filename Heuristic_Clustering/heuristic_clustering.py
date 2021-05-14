@@ -8,6 +8,7 @@ from RLrfAlgoEx import RLrfAlgoEx
 from mab_solvers.UCB_SRSU import UCBsrsu
 from utils import debugging_printer, preprocess
 
+
 # arglabel = None
 # if len(argv) == 7:
 #     script, argfile, argseed, argmetric, argiter, argbatch, argtl = argv
@@ -92,11 +93,16 @@ def configure_mab_solver(data, seed=42, metric='sil', output_file='heuristic_clu
 # # time_limit = 1000
 # iterations = Constants.bandit_iterations
 # # iterations = 5000
-def run(spark_df, seed=42, metric='sil', output_file='heuristic_clustering_output', algorithm=Constants.algorithm, \
-        batch_size=Constants.batch_size, time_limit=Constants.tuner_timeout, iterations=Constants.bandit_iterations):
+def run(spark_df, seed=42, metric='sil', output_file='AutoClustering_output.txt', algorithm=Constants.algorithm,
+        batch_size=Constants.batch_size, time_limit=Constants.tuner_timeout, iterations=Constants.bandit_iterations,
+        max_clusters=Constants.n_clusters_upper_bound):
     true_labels = None
 
-    # X = np.array(data, dtype=np.double)  # change to spark df
+    Constants.batch_size = batch_size
+    Constants.tuner_timeout = time_limit
+    Constants.bandit_iterations = iterations
+    Constants.n_clusters_upper_bound = max_clusters
+
     f = open(file=output_file, mode='a')
 
     print("DF before preproc")
@@ -104,16 +110,19 @@ def run(spark_df, seed=42, metric='sil', output_file='heuristic_clustering_outpu
     spark_df = preprocess(spark_df)
     print("DF after preproc")
     spark_df.show(10)
+
     # core part:
     # initializing multi-arm bandit solver:
     mab_solver = configure_mab_solver(spark_df, algorithm=algorithm, metric=metric, seed=seed)
 
     start = time.time()
+
     # Random initialization:
     mab_solver.initialize(f, true_labels)
     time_init = time.time() - start
 
     start = time.time()
+
     # RUN actual Multi-Arm:
     its = mab_solver.iterate(iterations, f)
     time_iterations = time.time() - start
@@ -178,3 +187,5 @@ def run(spark_df, seed=42, metric='sil', output_file='heuristic_clustering_outpu
         f.write("\n")
 
     f.flush()
+
+    return algorithm_executor

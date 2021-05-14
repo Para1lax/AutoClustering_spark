@@ -25,7 +25,7 @@ class ClusteringArmThread:
         self.algorithm_name = algorithm_name
         self.metric = metric
         self.data = data
-        debugging_printer(place="ClusteringArmThread.__init__", info_name="DATA", info=data.head())
+        self.current_labels = None
         self.value = Constants.bad_cluster
         self.parameters = dict()
         self.seed = seed
@@ -40,7 +40,7 @@ class ClusteringArmThread:
         elif algorithm_name == Constants.bisecting_kmeans:
             self.configuration_space.add_hyperparameters(self.get_bisecting_kmeans_configspace())
 
-    def get_labels(self, configuration):
+    def update_labels(self, configuration):
         if self.algorithm_name == Constants.kmeans_algo:
             algorithm = KMeans_spark(predictionCol='labels', **configuration)
         elif self.algorithm_name == Constants.gm_algo:
@@ -72,19 +72,13 @@ class ClusteringArmThread:
 
         if self.algorithm_name in Constants.rewrited:
             predictions = model.transform(self.data)
-            labels = predictions
-        # elif (self.algorithm_name == Constants.gm_algo) or (self.algorithm_name == Constants.bgm_algo):
-        #     labels = model.predict(self.data)
+            self.current_labels = predictions
         else:
-            labels = model.labels_
-
-        return labels
+            self.current_labels = model.labels_
 
     def clu_run(self, cfg):
-        data_with_labels = self.get_labels(cfg)
-        # TODO : never here!
-        debugging_printer("clu_run -> return Metric.metric(data_with_labels)")
-        return Metric.metric(data_with_labels)
+        self.update_labels(cfg)
+        return Metric.metric(self.current_labels)
 
     @staticmethod
     def get_kmeans_configspace():

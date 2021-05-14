@@ -56,10 +56,6 @@ class RFRS(object):
 
     def get_best_from_forest(self):
         return self.last_turn_min
-        # for est in self.model.estimators_:
-        #     for node in est.nodes:
-        #         if node.is_leaf:
-        #             print(node)
 
     def optimize(self):
 
@@ -71,9 +67,6 @@ class RFRS(object):
             # X (numpy.ndarray) – configuration vector x instance features
             # Y (numpy.ndarray) – cost values
             X, Y = self.rh2EPM.transform(self.runhistory)
-            # if Constants.DEBUG:
-            #     print('======================RFRS -> optimize======================')
-            #     print(' -> X: {}\n{} \n -> Y: {}\n{}'.format(type(X), X, type(Y), Y))
 
             # get all found configurations sorted according to acq
             challengers = self.choose_next(X, Y)
@@ -82,9 +75,7 @@ class RFRS(object):
             for ch in challengers:
                 # cfg = Configuration(configuration_space=self.config_space, vector=ch)
                 cfg = ch
-                debugging_printer(place='RFRS.py -> optimize', info_name='ch', info=ch)
                 start_time = time.time()
-                debugging_printer(place='RFRS.py -> optimize\nvalue = self.tae_runner(cfg)')
                 value = self.tae_runner(cfg)
                 # try:
                 #     debugging_printer(place='RFRS.py -> optimize\nvalue = self.tae_runner(cfg)')
