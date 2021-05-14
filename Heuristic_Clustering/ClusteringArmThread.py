@@ -41,33 +41,34 @@ class ClusteringArmThread:
             self.configuration_space.add_hyperparameters(self.get_bisecting_kmeans_configspace())
 
     def get_labels(self, configuration):
-        model = None
         if self.algorithm_name == Constants.kmeans_algo:
-            model = KMeans_spark(predictionCol='labels', **configuration)
+            algorithm = KMeans_spark(predictionCol='labels', **configuration)
         elif self.algorithm_name == Constants.gm_algo:
-            model = GaussianMixture_spark(predictionCol='labels', **configuration)
+            algorithm = GaussianMixture_spark(predictionCol='labels', **configuration)
         elif self.algorithm_name == Constants.bisecting_kmeans:
-            model = BisectingKMeans_spark(predictionCol='labels', **configuration)
+            algorithm = BisectingKMeans_spark(predictionCol='labels', **configuration)
 
-        if Constants.DEBUG:
-            model.fit(self.data)
-        else:
-            # Some problems with smac, old realization, don't change
-            try:
-                model.fit(self.data)
-            except:
-                try:
-                    exc_info = sys.exc_info()
-                    try:
-                        model.fit(self.data)  # try again
-                    except:
-                        pass
-                finally:
-                    print("Error occured while fitting " + self.algorithm_name)
-                    print("Error occured while fitting " + self.algorithm_name, file=sys.stderr)
-                    traceback.print_exception(*exc_info)
-                    del exc_info
-                    return Constants.bad_cluster
+        model = algorithm.fit(self.data)
+
+        # if Constants.DEBUG:
+        #     model.fit(self.data)
+        # else:
+        #     # Some problems with smac, old realization, don't change
+        #     try:
+        #         model.fit(self.data)
+        #     except:
+        #         try:
+        #             exc_info = sys.exc_info()
+        #             try:
+        #                 model.fit(self.data)  # try again
+        #             except:
+        #                 pass
+        #         finally:
+        #             print("Error occured while fitting " + self.algorithm_name)
+        #             print("Error occured while fitting " + self.algorithm_name, file=sys.stderr)
+        #             traceback.print_exception(*exc_info)
+        #             del exc_info
+        #             return Constants.bad_cluster
 
         if self.algorithm_name in Constants.rewrited:
             predictions = model.transform(self.data)
