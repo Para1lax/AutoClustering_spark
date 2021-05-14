@@ -81,6 +81,7 @@ class ClusteringArmThread:
 
     def clu_run(self, cfg):
         data_with_labels = self.get_labels(cfg)
+        # TODO : never here!
         debugging_printer("clu_run -> return Metric.metric(data_with_labels)")
         return Metric.metric(data_with_labels)
 

@@ -82,11 +82,16 @@ class RFRS(object):
             for ch in challengers:
                 # cfg = Configuration(configuration_space=self.config_space, vector=ch)
                 cfg = ch
+                debugging_printer(place='RFRS.py -> optimize', info_name='ch', info=ch)
                 start_time = time.time()
-                try:
-                    value = self.tae_runner(cfg)
-                except:
-                    value = sys.float_info.max
+                debugging_printer(place='RFRS.py -> optimize\nvalue = self.tae_runner(cfg)')
+                value = self.tae_runner(cfg)
+                # try:
+                #     debugging_printer(place='RFRS.py -> optimize\nvalue = self.tae_runner(cfg)')
+                #     value = self.tae_runner(cfg)
+                # except:
+                #     value = sys.float_info.max
+
                 time_spent = time.time() - start_time
                 self.runhistory.add(cfg, value, time_spent, StatusType.SUCCESS)
                 if value <= self.best_val:
