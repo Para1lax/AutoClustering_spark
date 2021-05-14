@@ -43,6 +43,7 @@ class MabSolver(TL):
         return 0
 
     def iteration(self, iteration_number, f, current_time=0):
+        # choosing arm
         cur_arm = self.draw()
         start = time.time()
         # CALL ARM here:
@@ -50,7 +51,9 @@ class MabSolver(TL):
         reward = self.action.apply(cur_arm, f, iteration_number, self.time_remaining, current_time)
         consumed = time.time() - start
         self.consume_limit(consumed)
+        # Time spent on each algo
         self.sum_spendings[cur_arm] += consumed
+        # all spendings
         self.spendings[cur_arm].append(consumed)
         self.register_action(cur_arm, consumed, reward)
 

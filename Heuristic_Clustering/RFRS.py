@@ -18,6 +18,7 @@ from smac.tae.execute_ta_run_old import ExecuteTARunOld
 from sklearn.ensemble import RandomForestRegressor
 
 import Constants
+from utils import debugging_printer
 
 
 class RFRS(object):
@@ -44,6 +45,7 @@ class RFRS(object):
         self.expansion_number = expansion_number
         self.batch_size = batch_size
         self.model = RandomForestRegressor(n_estimators=100, random_state=42)
+        # действующая конфигурация
         self.incumbent = None
         self.best_val = sys.float_info.max
         self.tae_runner = tae_runner
@@ -63,6 +65,7 @@ class RFRS(object):
 
         processed = 0
 
+        debugging_printer(place='RFRS.py -> optimize', info_name='batch_size', info=self.batch_size)
         while processed < self.batch_size:
             # New configuration generation:
             # X (numpy.ndarray) – configuration vector x instance features
@@ -89,7 +92,6 @@ class RFRS(object):
                 if value <= self.best_val:
                     self.incumbent = cfg
                     self.best_val = value
-
                 processed += 1
                 if processed >= self.batch_size:
                     break

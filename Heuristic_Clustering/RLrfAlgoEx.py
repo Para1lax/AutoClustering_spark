@@ -35,10 +35,11 @@ class RLrfAlgoEx:
         self.rf = RandomForestRegressor(n_estimators=1000, random_state=42)
 
     def apply(self, arm, file, iteration_number, remaining_time=None, current_time=0):
+        # RLthreadRFRS[arm]
         th = self.th[arm]
 
         # initially, run_num for each arm == 0, thus we allocate 1 batch of target f calls:
-        th.new_scenario(self.run_num[arm] + 1, remaining_time)  # add budget
+        th.new_scenario(c=self.run_num[arm] + 1, remaining_time=remaining_time)  # add budget
 
         run_start = time.time()
         th.run()

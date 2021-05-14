@@ -38,8 +38,6 @@ class UCB(MabSolver):
 
         debugging_printer(place='UCB.py -> initialize', info_name='Data after random initialization',
                           info=self.action.data.head())
-        # TODO: delete show
-        self.action.data.show(10)
         # TODO: rewrite Metric to Spark
         res = Metric.metric(self.action.data)
         debugging_printer(place='UCB.py -> initialize', info_name='Type of result of metric',
