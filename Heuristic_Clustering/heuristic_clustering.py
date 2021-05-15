@@ -95,7 +95,7 @@ def run(spark_df, seed=42, metric='sil', output_file='AutoClustering_output.txt'
     true_labels = None
 
     Constants.algorithm = algorithm
-    Constants.num_algos = len(algorithm)
+    Constants.num_algos = len(algorithms)
     Constants.batch_size = Constants.batch_size
     Constants.bandit_timeout = timeout
     Constants.bandit_iterations = iterations
