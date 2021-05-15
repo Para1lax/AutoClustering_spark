@@ -2,3 +2,5 @@
 *ipynb
 *.pyc
 *.xml
+.idea/vcs.xml
+.idea/workspace.xml
