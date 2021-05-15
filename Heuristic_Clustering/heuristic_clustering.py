@@ -90,8 +90,27 @@ def configure_mab_solver(data, seed, metric, algorithm, params):
 # # time_limit = 1000
 # iterations = Constants.bandit_iterations
 # # iterations = 5000
-def run(spark_df, seed=42, metric='sil', output_file='AutoClustering_output.txt', algorithm=Constants.algorithm,
-        batch_size=40, timeout=30, iterations=40, max_clusters=15, algorithms=Constants.algos):
+def run(spark_df, seed=42, metric='sil', output_file='AutoClustering_output.txt', batch_size=40, timeout=30,
+        iterations=40, max_clusters=15, algorithms=Constants.algos, algorithm=Constants.algorithm):
+    """
+    Performs searching for best clustering algorithm and its configuration
+
+    Parameters
+    ----------
+    spark_df : Spark dataframe
+    seed : Random seed value
+    metric : One of realized metrics
+    output_file : Path to file where you want to see logs
+    batch_size : processed configurations at one time
+    timeout : Seconds for each bandit iteration
+    iterations
+    max_clusters
+    algorithms
+
+    Returns
+    -------
+    """
+
     true_labels = None
 
     params = Parameters(algorithms=algorithms, n_clusters_upper_bound=max_clusters,
