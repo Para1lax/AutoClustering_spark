@@ -3,7 +3,7 @@
 import time
 import numpy as np
 
-import Constants
+from Constants import Constants
 from RLrfAlgoEx import RLrfAlgoEx
 from mab_solvers.UCB_SRSU import UCBsrsu
 from utils import debugging_printer, preprocess
@@ -69,16 +69,13 @@ from utils import debugging_printer, preprocess
 #     return mab_solver
 
 # checking rfrsls-ucb-SRSU only
-def configure_mab_solver(data, seed=42, metric='sil', output_file='heuristic_clustering_output', \
-                         algorithm=Constants.algorithm, batch_size=Constants.batch_size, \
-                         time_limit=Constants.tuner_timeout, iterations=Constants.bandit_iterations):
+def configure_mab_solver(data, seed, metric):
     """
     Creates and configures the corresponding MAB-solver.
     :param algorithm: algorithm to be used.
     """
     # algorithm.startswith("rfrsls-ucb-SRSU"):
     algorithm_executor = RLrfAlgoEx(data=data, metric=metric, seed=seed, batch_size=batch_size, expansion=100)
-    debugging_printer("configure_mab_solver -> UCBsrsu")
     mab_solver = UCBsrsu(action=algorithm_executor, time_limit=time_limit)
 
     return mab_solver
@@ -93,14 +90,17 @@ def configure_mab_solver(data, seed=42, metric='sil', output_file='heuristic_clu
 # iterations = Constants.bandit_iterations
 # # iterations = 5000
 def run(spark_df, seed=42, metric='sil', output_file='AutoClustering_output.txt', algorithm=Constants.algorithm,
-        batch_size=Constants.batch_size, time_limit=Constants.tuner_timeout, iterations=Constants.bandit_iterations,
-        max_clusters=Constants.n_clusters_upper_bound):
+        batch_size=Constants.batch_size, timeout=Constants.bandit_timeout, iterations=Constants.bandit_iterations,
+        max_clusters=Constants.n_clusters_upper_bound, algorithms=Constants.algos):
     true_labels = None
 
-    Constants.batch_size = batch_size
-    Constants.tuner_timeout = time_limit
+    Constants.algorithm = algorithm
+    Constants.num_algos = len(algorithm)
+    Constants.batch_size = Constants.batch_size
+    Constants.bandit_timeout = timeout
     Constants.bandit_iterations = iterations
     Constants.n_clusters_upper_bound = max_clusters
+    Constants.tuner_timeout = timeout * (iterations + 1) / Constants.num_algos
 
     f = open(file=output_file, mode='a')
 

@@ -4,7 +4,7 @@ import numpy as np
 
 from sklearn.ensemble import RandomForestRegressor
 
-import Constants
+from Constants import Constants
 from RLthreadRFRS import RLthreadRFRS
 from utils import debugging_printer
 

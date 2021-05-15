@@ -17,7 +17,6 @@ from smac.tae import StatusType
 from smac.tae.execute_ta_run_old import ExecuteTARunOld
 from sklearn.ensemble import RandomForestRegressor
 
-import Constants
 from utils import debugging_printer
 
 

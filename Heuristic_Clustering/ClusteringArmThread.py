@@ -14,7 +14,7 @@ from pyspark.ml.clustering import BisectingKMeans as BisectingKMeans_spark
 from smac.configspace import ConfigurationSpace
 from pyspark.ml.feature import VectorAssembler
 
-import Constants
+from Constants import Constants
 import Metric
 from utils import debugging_printer
 
