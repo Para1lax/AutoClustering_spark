@@ -69,7 +69,7 @@ from utils import debugging_printer, preprocess
 #     return mab_solver
 
 # checking rfrsls-ucb-SRSU only
-def configure_mab_solver(data, seed, metric):
+def configure_mab_solver(data, seed, metric, algorithm):
     """
     Creates and configures the corresponding MAB-solver.
     :param algorithm: algorithm to be used.
