@@ -76,7 +76,7 @@ def configure_mab_solver(data, seed, metric, algorithm, params):
     :param algorithm: algorithm to be used.
     """
     # algorithm.startswith("rfrsls-ucb-SRSU"):
-    algorithm_executor = RLrfAlgoEx(data=data, metric=metric, seed=seed, batch_size=Constants.batch_size, expansion=100)
+    algorithm_executor = RLrfAlgoEx(data=data, metric=metric, seed=seed, params=params, expansion=100)
     mab_solver = UCBsrsu(action=algorithm_executor, params=params)
 
     return mab_solver
@@ -152,10 +152,10 @@ def run(spark_df, seed=42, metric='sil', output_file='AutoClustering_output.txt'
                 pass
 
         f.write("\n")
-        for i in range(0, Constants.num_algos):
+        for i in range(0, params.num_algos):
             s = algorithm_executor.smacs[i]
             _, Y = s.solver.rh2EPM.transform(s.solver.runhistory)
-            f.write(Constants.algos[i] + ":\n")
+            f.write(params.algos[i] + ":\n")
             f.write("Ys:\n")
             for x in Y:
                 f.write(str(x[0]))
