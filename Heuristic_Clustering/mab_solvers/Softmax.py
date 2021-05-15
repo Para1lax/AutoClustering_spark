@@ -45,7 +45,7 @@ class Softmax(MabSolver):
         gained by calculating metrics on randomly assigned labels.
         """
         print("\nInit Softmax with tau = " + str(self.tau))
-        n_clusters = 15
+        n_clusters = Constants.n_clusters_upper_bound
         labels = np.random.randint(0, n_clusters, len(self.action.X))
         for c in range(0, n_clusters):
             labels[c] = c

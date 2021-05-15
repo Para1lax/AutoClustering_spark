@@ -25,8 +25,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2191cc68-8308-4c32-accb-e446882f7db8" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Heuristic_Clustering/RFRS.py" beforeDir="false" afterPath="$PROJECT_DIR$/Heuristic_Clustering/RFRS.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Heuristic_Clustering/heuristic_clustering.py" beforeDir="false" afterPath="$PROJECT_DIR$/Heuristic_Clustering/heuristic_clustering.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -92,6 +91,9 @@
       <module name="AutoClustering_spark" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="C:\Users\Vladimir\AppData\Local\Programs\Python\Python38\python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Heuristic_Clustering" />
       <option name="IS_MODULE_SDK" value="false" />
@@ -116,7 +118,14 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1619392393081</updated>
-      <workItem from="1619392394445" duration="17824000" />
+      <workItem from="1619392394445" duration="24027000" />
+      <workItem from="1619732339238" duration="1521000" />
+      <workItem from="1619741494692" duration="10260000" />
+      <workItem from="1620058028613" duration="23297000" />
+      <workItem from="1620510939763" duration="19149000" />
+      <workItem from="1620702215931" duration="13078000" />
+      <workItem from="1620851327725" duration="595000" />
+      <workItem from="1620948467354" duration="28398000" />
     </task>
     <servers />
   </component>
@@ -133,6 +142,7 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
     <state x="223" y="67" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1619562518325">

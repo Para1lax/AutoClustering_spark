@@ -6,140 +6,137 @@ import sys
 from ConfigSpace.conditions import InCondition
 from ConfigSpace.hyperparameters import CategoricalHyperparameter, \
     UniformFloatHyperparameter, UniformIntegerHyperparameter, Constant
-from sklearn.cluster import AffinityPropagation
-from sklearn.cluster import AgglomerativeClustering
-from sklearn.cluster import DBSCAN
-from sklearn.cluster import KMeans
-from sklearn.cluster import MeanShift, estimate_bandwidth
-from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
-from smac.configspace import ConfigurationSpace
-# from smac.facade.smac_facade import SMAC
-# from smac.scenario.scenario import Scenario
 
-import Constants
+from pyspark.ml.clustering import KMeans as KMeans_spark
+from pyspark.ml.clustering import GaussianMixture as GaussianMixture_spark
+from pyspark.ml.clustering import BisectingKMeans as BisectingKMeans_spark
+
+from smac.configspace import ConfigurationSpace
+from pyspark.ml.feature import VectorAssembler
+
+from Constants import Constants
 import Metric
+from utils import debugging_printer
 
 
 class ClusteringArmThread:
-    def __init__(self, data, name, metric, seed):
-        self.thread_name = name
+
+    def __init__(self, data, algorithm_name, metric, seed, params):
+        self.algorithm_name = algorithm_name
         self.metric = metric
         self.data = data
+        self.current_labels = None
+        self.n_clusters_upper_bound = params.n_clusters_upper_bound
         self.value = Constants.bad_cluster
         self.parameters = dict()
         self.seed = seed
         self.configuration_space = ConfigurationSpace()
 
-        if (name == Constants.kmeans_algo):
-            algorithm = CategoricalHyperparameter("algorithm", ["auto", "full", "elkan"])
-            tol = UniformFloatHyperparameter("tol", 1e-6, 1e-2)
-            n_clusters = UniformIntegerHyperparameter("n_clusters", 2, 15)
-            n_init = UniformIntegerHyperparameter("n_init", 2, 15)
-            max_iter = UniformIntegerHyperparameter("max_iter", 50, 1500)
-            verbose = Constant("verbose", 0)
-            self.configuration_space.add_hyperparameters([n_clusters, n_init, max_iter, tol, verbose, algorithm])
+        if algorithm_name == Constants.kmeans_algo:
+            self.configuration_space.add_hyperparameters(self.get_kmeans_configspace(self.n_clusters_upper_bound))
 
-        elif (name == Constants.affinity_algo):
-            damping = UniformFloatHyperparameter("damping", 0.5, 1.0)
-            max_iter = UniformIntegerHyperparameter("max_iter", 100, 1000)
-            convergence_iter = UniformIntegerHyperparameter("convergence_iter", 5, 20)
-            self.configuration_space.add_hyperparameters([damping, max_iter, convergence_iter])
+        elif algorithm_name == Constants.gm_algo:
+            self.configuration_space.add_hyperparameters(self.get_gaussian_mixture_configspace(self.n_clusters_upper_bound))
 
-        elif (name == Constants.mean_shift_algo):
-            quantile = UniformFloatHyperparameter("quantile", 0.0, 1.0)
-            bin_seeding = UniformIntegerHyperparameter("bin_seeding", 0, 1)
-            min_bin_freq = UniformIntegerHyperparameter("min_bin_freq", 1, 100)
-            cluster_all = UniformIntegerHyperparameter("cluster_all", 0, 1)
-            self.configuration_space.add_hyperparameters([quantile, bin_seeding, min_bin_freq, cluster_all])
+        elif algorithm_name == Constants.bisecting_kmeans:
+            self.configuration_space.add_hyperparameters(self.get_bisecting_kmeans_configspace(self.n_clusters_upper_bound))
 
-        elif (name == Constants.ward_algo):
-            linkage = CategoricalHyperparameter("linkage", ["ward", "complete", "average"])
-            affinity_all = CategoricalHyperparameter("affinity_a",
-                                                     ["euclidean", "l1", "l2", "manhattan", "cosine", "precomputed"])
-            affinity_ward = CategoricalHyperparameter("affinity_w", ["euclidean"])
-            n_clusters = UniformIntegerHyperparameter("n_clusters", 2, 15)
-            self.configuration_space.add_hyperparameters([n_clusters, affinity_all, affinity_ward, linkage])
-            self.configuration_space.add_condition(InCondition(child=affinity_ward, parent=linkage, values=["ward"]))
-            self.configuration_space.add_condition(
-                InCondition(child=affinity_all, parent=linkage, values=["ward", "complete", "average"]))
+    def update_labels(self, configuration):
+        if self.algorithm_name == Constants.kmeans_algo:
+            algorithm = KMeans_spark(predictionCol='labels', **configuration)
+        elif self.algorithm_name == Constants.gm_algo:
+            algorithm = GaussianMixture_spark(predictionCol='labels', **configuration)
+        elif self.algorithm_name == Constants.bisecting_kmeans:
+            algorithm = BisectingKMeans_spark(predictionCol='labels', **configuration)
 
-        elif (name == Constants.dbscan_algo):
-            algorithm = CategoricalHyperparameter("algorithm", ["auto", "ball_tree", "kd_tree", "brute"])
-            eps = UniformFloatHyperparameter("eps", 0.1, 0.9)
-            min_samples = UniformIntegerHyperparameter("min_samples", 2, 10)
-            leaf_size = UniformIntegerHyperparameter("leaf_size", 5, 100)
-            self.configuration_space.add_hyperparameters([eps, min_samples, algorithm, leaf_size])
+        model = algorithm.fit(self.data)
 
-        elif (name == Constants.gm_algo):
-            cov_t = CategoricalHyperparameter("covariance_type", ["full", "tied", "diag", "spherical"])
-            tol = UniformFloatHyperparameter("tol", 1e-6, 0.1)
-            reg_c = UniformFloatHyperparameter("reg_covar", 1e-10, 0.1)
-            n_com = UniformIntegerHyperparameter("n_components", 2, 15)
-            max_iter = UniformIntegerHyperparameter("max_iter", 10, 1000)
-            self.configuration_space.add_hyperparameters([cov_t, tol, reg_c, n_com, max_iter])
+        # if Constants.DEBUG:
+        #     model.fit(self.data)
+        # else:
+        #     # Some problems with smac, old realization, don't change
+        #     try:
+        #         model.fit(self.data)
+        #     except:
+        #         try:
+        #             exc_info = sys.exc_info()
+        #             try:
+        #                 model.fit(self.data)  # try again
+        #             except:
+        #                 pass
+        #         finally:
+        #             print("Error occured while fitting " + self.algorithm_name)
+        #             print("Error occured while fitting " + self.algorithm_name, file=sys.stderr)
+        #             traceback.print_exception(*exc_info)
+        #             del exc_info
+        #             return Constants.bad_cluster
 
-        elif (name == Constants.bgm_algo):
-            cov_t = CategoricalHyperparameter("covariance_type", ["full", "tied", "diag", "spherical"])
-            tol = UniformFloatHyperparameter("tol", 1e-6, 0.1)
-            reg_c = UniformFloatHyperparameter("reg_covar", 1e-10, 0.1)
-            wcp = UniformFloatHyperparameter("weight_concentration_prior", 1e-10, 0.1)
-            mpp = UniformFloatHyperparameter("mean_precision_prior", 1e-10, 0.1)
-            n_com = UniformIntegerHyperparameter("n_components", 2, 15)
-            max_iter = UniformIntegerHyperparameter("max_iter", 10, 1000)
-            self.configuration_space.add_hyperparameters([wcp, mpp, cov_t, tol, reg_c, n_com, max_iter])
-
-    def cluster(self, cfg):
-        cl = None
-        if (self.thread_name == Constants.kmeans_algo):
-            cl = KMeans(**cfg)
-        elif (self.thread_name == Constants.affinity_algo):
-            cl = AffinityPropagation(**cfg)
-        elif (self.thread_name == Constants.mean_shift_algo):
-            bandwidth = estimate_bandwidth(self.data, quantile=cfg['quantile'])
-            cl = MeanShift(bandwidth=bandwidth, bin_seeding=bool(cfg['bin_seeding']), min_bin_freq=cfg['min_bin_freq'],
-                           cluster_all=bool(cfg['cluster_all']))
-        elif (self.thread_name == Constants.ward_algo):
-            linkage = cfg["linkage"]
-            aff = ""
-            if ("ward" in linkage):
-                aff = cfg["affinity_w"]
-            else:
-                aff = cfg["affinity_a"]
-            n_c = cfg["n_clusters"]
-            cl = AgglomerativeClustering(n_clusters=n_c, linkage=linkage, affinity=aff)
-        elif (self.thread_name == Constants.dbscan_algo):
-            cl = DBSCAN(**cfg)
-        elif (self.thread_name == Constants.gm_algo):
-            cl = GaussianMixture(**cfg)
-        elif (self.thread_name == Constants.bgm_algo):
-            cl = BayesianGaussianMixture(**cfg)
-
-        try:
-            cl.fit(self.data)
-        except:
-            try:
-                exc_info = sys.exc_info()
-                try:
-                    cl.fit(self.data)  # try again
-                except:
-                    pass
-            finally:
-                print("Error occured while fitting " + self.thread_name)
-                print("Error occured while fitting " + self.thread_name, file=sys.stderr)
-                traceback.print_exception(*exc_info)
-                del exc_info
-                return Constants.bad_cluster
-
-        if (self.thread_name == Constants.gm_algo) or (self.thread_name == Constants.bgm_algo):
-            labels = cl.predict(self.data)
+        if self.algorithm_name in Constants.rewrited:
+            predictions = model.transform(self.data)
+            self.current_labels = predictions
         else:
-            labels = cl.labels_
-        return labels
+            self.current_labels = model.labels_
 
     def clu_run(self, cfg):
-        labels = self.cluster(cfg)
-        labels_unique = np.unique(labels)
-        n_clusters = len(labels_unique)
-        value = Metric.metric(self.data, n_clusters, labels, self.metric)
+        self.update_labels(cfg)
+        return Metric.metric(self.current_labels)
 
-        return value
+    @staticmethod
+    def get_kmeans_configspace(n_clusters_upper_bound):
+        """
+        k : number of clusters
+        initMode : The initialization algorithm. This can be either "random" to choose random points as initial cluster
+                   centers, or "k-means||" to use a parallel variant of k-means++
+        initSteps : The number of steps for k-means|| initialization mode. Must be > 0
+        maxIter : max number of iterations (>= 0)
+        seed : random seed
+        distanceMeasure : Supported options: 'euclidean' and 'cosine'.
+
+        Returns
+        -----------------
+        Tuple of parameters
+        """
+        k = UniformIntegerHyperparameter("k", 2, n_clusters_upper_bound)
+        initMode = CategoricalHyperparameter("initMode", ['random', 'k-means||'])
+        initSteps = UniformIntegerHyperparameter("initSteps", 1, 5)
+        maxIter = UniformIntegerHyperparameter("maxIter", 5, 50)
+        distanceMeasure = CategoricalHyperparameter("distanceMeasure", ['euclidean', 'cosine'])
+        return k, initMode, initSteps, maxIter, distanceMeasure
+
+    @staticmethod
+    def get_gaussian_mixture_configspace(n_clusters_upper_bound):
+        """
+        k : number of clusters
+        aggregationDepth : suggested depth for treeAggregate (>= 2)
+        maxIter : max number of iterations (>= 0)
+        tol : the convergence tolerance for iterative algorithms (>= 0)
+
+        Returns
+        -------
+        Tuple of parameters
+        """
+        k = UniformIntegerHyperparameter("k", 2, n_clusters_upper_bound)
+        maxIter = UniformIntegerHyperparameter("maxIter", 5, 50)
+        tol = UniformFloatHyperparameter("tol", 1e-6, 0.1)
+        return k, maxIter, tol
+
+    @staticmethod
+    def get_bisecting_kmeans_configspace(n_clusters_upper_bound):
+        """
+        k : number of clusters
+        initSteps : The number of steps for k-means|| initialization mode. Must be > 0
+        maxIter : max number of iterations (>= 0)
+        seed : random seed
+        distanceMeasure : Supported options: 'euclidean' and 'cosine'.
+        minDivisibleClusterSize : The minimum number of points (if >= 1.0) or the minimum proportion of points
+                                                               (if < 1.0) of a divisible cluster.
+                                                               we use only proportion
+        Returns
+        -----------------
+        Tuple of parameters
+        """
+        k = UniformIntegerHyperparameter("k", 2, n_clusters_upper_bound)
+        maxIter = UniformIntegerHyperparameter("maxIter", 5, 50)
+        distanceMeasure = CategoricalHyperparameter("distanceMeasure", ['euclidean', 'cosine'])
+        minDivisibleClusterSize = UniformFloatHyperparameter("minDivisibleClusterSize", 0.01, 1.0)
+        return k, maxIter, distanceMeasure, minDivisibleClusterSize

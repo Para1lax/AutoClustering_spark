@@ -37,7 +37,7 @@ class RLsmacAlgoEx:
         if reward < self.best_val:
             self.best_val = reward
             self.best_param = th.parameters
-            self.best_algo = th.thread_name
+            self.best_algo = th.algorithm_name
         file.write(str(iteration_number) + ', ' + self.metric + ', ' + str(self.best_val) + ', ' + self.best_algo +
                    ', ' + self.clu_algos[arm] + ', ' + str(reward) + '\n')
         return (Constants.in_reward - reward) / Constants.in_reward

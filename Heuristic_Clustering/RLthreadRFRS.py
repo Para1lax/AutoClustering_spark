@@ -7,14 +7,13 @@ from smac.scenario.scenario import Scenario
 
 class RLthreadRFRS(ClusteringArmThread):
     def __init__(self, data: DataFrame, algorithm_name: str, metric: str, seed: int, batch_size: int,
-                 expansion=5000):
+                 expansion=5000, params=None):
         self.run_count = batch_size
         # TODO: rewrite ClusteringArmThread
-        ClusteringArmThread.__init__(self, data.toPandas().values, algorithm_name, metric,
-                                     seed)  # populates config space
+        ClusteringArmThread.__init__(self, data, algorithm_name, metric,
+                                     seed, params=params)  # populates config space
         self.new_scenario(1)  # initial scenario
 
-        # TODO: rewrite RFRS
         self.optimizer = RFRS(scenario=self.clu_scenario,
                               tae_runner=self.clu_run,
                               expansion_number=expansion,
@@ -40,7 +39,6 @@ class RLthreadRFRS(ClusteringArmThread):
                                           })
 
     def run(self):
-        print('Run RFRS ' + self.thread_name)
-
+        print('Run RFRS ' + self.algorithm_name)
         self.parameters = self.optimizer.optimize()
         self.value = self.optimizer.get_runhistory().get_cost(self.parameters)

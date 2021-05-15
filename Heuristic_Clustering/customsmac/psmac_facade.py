@@ -29,6 +29,7 @@ __author__ = "Andre Biedenkapp"
 __copyright__ = "Copyright 2018, ML4AAD"
 __license__ = "3-clause BSD"
 
+
 def optimize(scenario: typing.Type[Scenario],
              tae: typing.Type[BaseRunner],
              tae_kwargs: typing.Dict,
@@ -69,7 +70,6 @@ def optimize(scenario: typing.Type[Scenario],
             fn=os.path.join(solver.output_dir, "runhistory.json")
         )
     return incumbent
-
 
 
 class PSMAC(object):
@@ -151,18 +151,18 @@ class PSMAC(object):
         else:
             self.val_set = val_set
 
-def optimize(self):
+    def optimize(self):
         """
-        Optimizes the algorithm provided in scenario (given in constructor)
+                Optimizes the algorithm provided in scenario (given in constructor)
 
-        Returns
-        -------
-        incumbent(s) : Configuration / List[Configuration] / ndarray[Configuration]
-            Incumbent / Portfolio of incumbents
-        pid(s) : int / ndarray[ints]
-            Process ID(s) from which the configuration stems
+                Returns
+                -------
+                incumbent(s) : Configuration / List[Configuration] / ndarray[Configuration]
+                    Incumbent / Portfolio of incumbents
+                pid(s) : int / ndarray[ints]
+                    Process ID(s) from which the configuration stems
 
-        """
+                """
         # Setup output directory
         if self.output_dir is None:
             self.scenario.output_dir = "psmac3-output_%s" % (
@@ -198,24 +198,23 @@ def optimize(self):
                 return [inc for i, inc in enumerate(incs) if i in val_ids]
             return [inc for i, inc in enumerate(incs) if i in est_ids]
 
-
-def get_best_incumbents_ids(self, incs: typing.List[Configuration]):
+    def get_best_incumbents_ids(self, incs: typing.List[Configuration]):
         """
-        Determines the IDs and costs of the best configurations
+                Determines the IDs and costs of the best configurations
 
-        Parameters
-        ----------
-        incs : typing.List[Configuration]
-            incumbents determined by all parallel SMAC runs
+                Parameters
+                ----------
+                incs : typing.List[Configuration]
+                    incumbents determined by all parallel SMAC runs
 
-        Returns
-        -------
-        Dict(Config -> Dict(inst_id (str) -> cost (float)))  (if real validation runs are performed)
-        List(ints) (indices of best configurations if validation runs are performed)
-        Dict(Config -> Dict(inst_id (str) -> cost (float)))  (if performance is estimated)
-        List(ints) (indices of best configurations if performance is estimated)
+                Returns
+                -------
+                Dict(Config -> Dict(inst_id (str) -> cost (float)))  (if real validation runs are performed)
+                List(ints) (indices of best configurations if validation runs are performed)
+                Dict(Config -> Dict(inst_id (str) -> cost (float)))  (if performance is estimated)
+                List(ints) (indices of best configurations if performance is estimated)
 
-        """
+                """
         if self.validate is True:
             mean_costs_conf_valid, cost_per_config_valid = self.validate_incs(incs)
             val_ids = list(map(lambda x: x[0],
@@ -227,24 +226,23 @@ def get_best_incumbents_ids(self, incs: typing.List[Configuration]):
                            sorted(enumerate(mean_costs_conf_estimate), key=lambda y: y[1])))[:self.n_incs]
         return cost_per_config_valid, val_ids, cost_per_config_estimate, est_ids
 
-
-def _get_mean_costs(self, incs: typing.List[Configuration], new_rh: RunHistory):
+    def _get_mean_costs(self, incs: typing.List[Configuration], new_rh: RunHistory):
         """
-        Compute mean cost per instance
+            Compute mean cost per instance
 
-        Parameters
-        ----------
-        incs : typing.List[Configuration]
-            incumbents determined by all parallel SMAC runs
-        new_rh : RunHistory
-            runhistory to determine mean performance
+            Parameters
+            ----------
+            incs : typing.List[Configuration]
+                incumbents determined by all parallel SMAC runs
+            new_rh : RunHistory
+                runhistory to determine mean performance
 
-        Returns
-        -------
-        List[float] means
-        Dict(Config -> Dict(inst_id(str) -> float))
+            Returns
+            -------
+            List[float] means
+            Dict(Config -> Dict(inst_id(str) -> float))
 
-        """
+            """
         config_cost_per_inst = {}
         results = []
         for incumbent in incs:
@@ -257,11 +255,10 @@ def _get_mean_costs(self, incs: typing.List[Configuration], new_rh: RunHistory):
                 results.append(np.nan)
         return results, config_cost_per_inst
 
-
-def validate_incs(self, incs: np.ndarray):
+    def validate_incs(self, incs: np.ndarray):
         """
-        Validation
-        """
+            Validation
+            """
         solver = SMAC4AC(scenario=self.scenario, rng=self.rng, run_id=MAXINT, **self.kwargs)
         self.logger.info('*' * 120)
         self.logger.info('Validating')

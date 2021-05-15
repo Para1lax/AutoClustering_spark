@@ -6,120 +6,132 @@ import time
 import numpy as np
 from sklearn import metrics
 from sklearn.metrics import confusion_matrix
+from pyspark.ml.evaluation import ClusteringEvaluator
 from pulp import *
 
-import Constants
+from Constants import Constants
+from utils import debugging_printer
 
 # Performance measurements:
 global_trace = {}
 
 
-def metric(X, n_clusters, labels, metric, true_labels=None):
-    if (n_clusters < 1):
-        raise ValueError('Number of clusters can\'t be less than 1.')
+# def metric(X, n_clusters, labels, metric, true_labels=None):
+#     if n_clusters < 1:
+#         raise ValueError('Number of clusters can\'t be less than 1.')
+#
+#     # Metrics do not support single-cluster data.
+#     if len(np.unique(labels)) == 1:
+#         return Constants.bad_cluster
+#
+#     # Rename all labels to be 0...(K-1)
+#     labels_map = {}
+#     for i in range(0, len(labels)):
+#         c = labels[i]
+#         if not (c in labels_map):
+#             labels_map[c] = len(labels_map)
+#
+#         labels[i] = labels_map[c]
+#
+#     start = time.time()
+#
+#     value = switch_and_call_metrics(X, labels, metric, n_clusters, true_labels)
+#
+#     # if not metric in global_trace:
+#     #     global_trace[metric] = []
+#     # global_trace[metric].append(time.time() - start)
+#
+#     return value
 
-    # Metrics do not support single-cluster data.
-    if len(np.unique(labels)) == 1:
-        return Constants.bad_cluster
-
-    # Rename all labels to be 0...(K-1)
-    labels_map = {}
-    for i in range(0, len(labels)):
-        c = labels[i]
-        if not (c in labels_map):
-            labels_map[c] = len(labels_map)
-
-        labels[i] = labels_map[c]
-
-    start = time.time()
-
-    value = switch_and_call_metrics(X, labels, metric, n_clusters, true_labels)
-
-    # if not metric in global_trace:
-    #     global_trace[metric] = []
-    # global_trace[metric].append(time.time() - start)
-
-    return value
+# TODO: change when more metrics arrived
+# TODO: delete prints when found where use metrics
+def metric(data, **kwargs):
+    try:
+        res = -ClusteringEvaluator(predictionCol='labels', distanceMeasure='squaredEuclidean').evaluate(data)
+        return res
+    except TypeError:
+        print("\n\nTYPE ERROR OCCURED IN Metric.py:\n\nDATA: {}\n\n".format(data))
+        return 0
 
 
 def switch_and_call_metrics(X, labels, metric, n_clusters, true_labels=None):
     # Switch by metric name:
 
-    if (Constants.purity_metric in metric):
+    if Constants.purity_metric in metric:
         ch = purity(X, n_clusters, labels, true_labels)
         return ch
 
-    if (Constants.rand_index_metric in metric):
+    if Constants.rand_index_metric in metric:
         ch = rand_index(X, n_clusters, labels, true_labels)
         return ch
 
-    if (Constants.dunn_metric in metric):
+    if Constants.dunn_metric in metric:
         dun = dunn(X, labels)
         return dun
-    if (Constants.cal_har_metric in metric):
+    if Constants.cal_har_metric in metric:
         ch = calinski_harabasz(X, n_clusters, labels)
         return ch
-    if (Constants.silhouette_metric in metric):
+    if Constants.silhouette_metric in metric:
         sc = silhoette(X, labels)  # [-1, 1]
         return sc
-    if (Constants.davies_bouldin_metric in metric):
+    if Constants.davies_bouldin_metric in metric:
         centroids = cluster_centroid(X, labels, n_clusters)
         db = davies_bouldin(X, n_clusters, labels, centroids)
         return db
-    if (Constants.dunn31_metric in metric):
+    if Constants.dunn31_metric in metric:
         gd31 = dunn31(X, labels, n_clusters)
         return gd31
-    if (Constants.dunn41_metric in metric):
+    if Constants.dunn41_metric in metric:
         centroids = cluster_centroid(X, labels, n_clusters)
         gd41 = dunn41(X, labels, n_clusters, centroids)
         return gd41
-    if (Constants.dunn51_metric in metric):
+    if Constants.dunn51_metric in metric:
         centroids = cluster_centroid(X, labels, n_clusters)
         gd51 = dunn51(X, labels, n_clusters, centroids)
         return gd51
-    if (Constants.dunn33_metric in metric):
+    if Constants.dunn33_metric in metric:
         centroids = cluster_centroid(X, labels, n_clusters)
         gd33 = dunn33(X, labels, n_clusters, centroids)
         return gd33
-    if (Constants.dunn43_metric in metric):
+    if Constants.dunn43_metric in metric:
         centroids = cluster_centroid(X, labels, n_clusters)
         gd43 = dunn43(X, labels, n_clusters, centroids)
         return gd43
-    if (Constants.dunn53_metric in metric):
+    if Constants.dunn53_metric in metric:
         centroids = cluster_centroid(X, labels, n_clusters)
         gd53 = dunn53(X, labels, n_clusters, centroids)
         return gd53
-    if (Constants.gamma_metric in metric):
+    if Constants.gamma_metric in metric:
         g = gamma(X, labels, n_clusters)
         return g
-    if (Constants.cs_metric in metric):
+    if Constants.cs_metric in metric:
         cs = cs_index(X, labels, n_clusters)
         return cs
-    if (Constants.db_star_metric in metric):
+    if Constants.db_star_metric in metric:
         dbs = db_star_index(X, labels, n_clusters)
         return dbs
-    if (Constants.sf_metric in metric):
+    if Constants.sf_metric in metric:
         sf_score = sf(X, labels, n_clusters)
         return sf_score
-    if (Constants.sym_metric in metric):
+    if Constants.sym_metric in metric:
         sym_score = sym(X, labels, n_clusters)
         return sym_score
-    if (Constants.cop_metric in metric):
+    if Constants.cop_metric in metric:
         cop_score = cop(X, labels, n_clusters)
         return cop_score
-    if (Constants.sv_metric in metric):
+    if Constants.sv_metric in metric:
         sv_score = sv(X, labels, n_clusters)
         return sv_score
-    if (Constants.os_metric in metric):
+    if Constants.os_metric in metric:
         os_score = os(X, labels, n_clusters)
         return os_score
-    if (Constants.sym_bd_metric in metric):
+    if Constants.sym_bd_metric in metric:
         sym_db_score = sym_db(X, labels, n_clusters)
         return sym_db_score
-    if (Constants.s_dbw_metric in metric):
+    if Constants.s_dbw_metric in metric:
         s_dbw_score = s_dbw(X, labels, n_clusters)
         return s_dbw_score
-    if (Constants.c_ind_metric in metric):
+    if Constants.c_ind_metric in metric:
         c_ind_score = c_ind(X, labels, n_clusters)
         return c_ind_score
     return Constants.bad_cluster
@@ -156,7 +168,7 @@ def dunn(X, labels):
     for i in range(0, rows - 1):
         for j in range(i + 1, rows):
             dist = euclidian_dist(X[i], X[j])
-            if (labels[i] != labels[j]):
+            if labels[i] != labels[j]:
                 minimum_dif_c = min(dist, minimum_dif_c)
             else:
                 maximum_same_c = max(dist, maximum_same_c)
@@ -193,6 +205,7 @@ def calinski_harabasz(X, n_clusters, labels):
     # ch /= float(sum_div)
     # return ch
     return -metrics.calinski_harabaz_score(X, labels)
+
 
 # Purity
 def purity(X, n_clusters, pred_labels, true_labels):
@@ -289,7 +302,7 @@ def get_metrices(labels, true_labels):
     TP = TP.astype(float)
     TN = TN.astype(float)
 
-    #TODO unclear
+    # TODO unclear
     return [FP, FN, TP, TN]
 
 
@@ -297,6 +310,7 @@ def rand_index(X, n_clusters, labels, true_labels):
     [FP, FN, TP, TN] = get_metrices(labels, true_labels)
 
     return (TP + TN) / (TP + FP + FN + TN)
+
 
 # Silhouette Coefficient, max is better, [-1, 1], add -
 def silhoette(X, labels):
@@ -309,7 +323,7 @@ def c_ind(X, labels, n_clusters):
     s_c = 0
     for i in range(0, rows - 1):
         for j in range(i + 1, rows):
-            if (labels[i] == labels[j]):
+            if labels[i] == labels[j]:
                 s_c += euclidian_dist(X[i], X[j])
     cluster_sizes = count_cluster_sizes(labels, n_clusters)
 
@@ -335,7 +349,7 @@ def c_ind(X, labels, n_clusters):
 def s(X, cluster_k_index, cluster_sizes, labels, centroids):
     sss = 0
     for i in range(0, len(labels)):
-        if (labels[i] == cluster_k_index):
+        if labels[i] == cluster_k_index:
             sss += euclidian_dist(X[i], centroids[cluster_k_index])
     return sss / cluster_sizes[cluster_k_index]
 
@@ -364,7 +378,7 @@ def davies_bouldin(X, n_clusters, labels, centroids):
                 tmp = max(tmp, a)
         db += tmp
     db /= float(n_clusters)
-    if (db < 1e-300):
+    if db < 1e-300:
         db = Constants.bad_cluster
     return db
 
@@ -409,7 +423,7 @@ def dunn41(X, labels, n_clusters, centroids):
 
     for i in range(0, int(math.ceil(float(rows) / 2.0))):
         for j in range(0, rows):
-            if (labels[i] != labels[j]):
+            if labels[i] != labels[j]:
                 dist = centers[labels[i]][labels[j]]
                 minimum_dif_c = min(dist, minimum_dif_c)
             else:
@@ -987,12 +1001,11 @@ def s_dbw(X, labels, n_clusters):
     stdev_val = stdev(X, labels, n_clusters)
 
     dens = 0.0
-    for k in range(0, n_clusters-1):
+    for k in range(0, n_clusters - 1):
         for l in range(k + 1, n_clusters):
             denominator = max(den1(X, labels, centroids, k, stdev_val), den1(X, labels, centroids, l, stdev_val))
             if denominator != 0:  # avoid zero division
                 dens += den2(X, labels, centroids, k, l, stdev_val)
-
 
     dens /= n_clusters * (n_clusters - 1)
     return sigmas + dens

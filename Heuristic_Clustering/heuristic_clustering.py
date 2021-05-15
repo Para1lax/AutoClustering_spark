@@ -3,9 +3,11 @@
 import time
 import numpy as np
 
-import Constants
+from Constants import Constants
 from RLrfAlgoEx import RLrfAlgoEx
 from mab_solvers.UCB_SRSU import UCBsrsu
+from utils import debugging_printer, preprocess
+from Parameters import Parameters
 
 
 # arglabel = None
@@ -67,20 +69,15 @@ from mab_solvers.UCB_SRSU import UCBsrsu
 #
 #     return mab_solver
 
-
 # checking rfrsls-ucb-SRSU only
-def configure_mab_solver(data, seed=42, metric='sil', output_file='heuristic_clustering_output', \
-                         algorithm=Constants.algorithm, batch_size=Constants.batch_size, \
-                         time_limit=Constants.tuner_timeout, iterations=Constants.bandit_iterations):
+def configure_mab_solver(data, seed, metric, algorithm, params):
     """
     Creates and configures the corresponding MAB-solver.
     :param algorithm: algorithm to be used.
     """
-
-    print("===============MAB_SOLVER===============")
     # algorithm.startswith("rfrsls-ucb-SRSU"):
-    algorithm_executor = RLrfAlgoEx(data=data, metric=metric, seed=seed, batch_size=batch_size, expansion=100)
-    mab_solver = UCBsrsu(action=algorithm_executor, time_limit=time_limit)
+    algorithm_executor = RLrfAlgoEx(data=data, metric=metric, seed=seed, params=params, expansion=100)
+    mab_solver = UCBsrsu(action=algorithm_executor, params=params)
 
     return mab_solver
 
@@ -93,23 +90,29 @@ def configure_mab_solver(data, seed=42, metric='sil', output_file='heuristic_clu
 # # time_limit = 1000
 # iterations = Constants.bandit_iterations
 # # iterations = 5000
-def run(spark_df, seed=42, metric='sil', output_file='heuristic_clustering_output', algorithm=Constants.algorithm, \
-        batch_size=Constants.batch_size, time_limit=Constants.tuner_timeout, iterations=Constants.bandit_iterations):
+def run(spark_df, seed=42, metric='sil', output_file='AutoClustering_output.txt', algorithm=Constants.algorithm,
+        batch_size=40, timeout=30, iterations=40, max_clusters=15, algorithms=Constants.algos):
     true_labels = None
 
-    # X = np.array(data, dtype=np.double)  # change to spark df
+    params = Parameters(algorithms=algorithms, n_clusters_upper_bound=max_clusters,
+                        bandit_timeout=timeout, bandit_iterations=iterations, batch_size=batch_size)
+
     f = open(file=output_file, mode='a')
+
+    spark_df = preprocess(spark_df)
 
     # core part:
     # initializing multi-arm bandit solver:
-    mab_solver = configure_mab_solver(spark_df, algorithm=algorithm, metric=metric, seed=seed)
+    mab_solver = configure_mab_solver(spark_df, algorithm=algorithm, metric=metric, seed=seed, params=params)
 
     start = time.time()
+
     # Random initialization:
     mab_solver.initialize(f, true_labels)
     time_init = time.time() - start
 
     start = time.time()
+
     # RUN actual Multi-Arm:
     its = mab_solver.iterate(iterations, f)
     time_iterations = time.time() - start
@@ -149,10 +152,10 @@ def run(spark_df, seed=42, metric='sil', output_file='heuristic_clustering_outpu
                 pass
 
         f.write("\n")
-        for i in range(0, Constants.num_algos):
+        for i in range(0, params.num_algos):
             s = algorithm_executor.smacs[i]
             _, Y = s.solver.rh2EPM.transform(s.solver.runhistory)
-            f.write(Constants.algos[i] + ":\n")
+            f.write(params.algos[i] + ":\n")
             f.write("Ys:\n")
             for x in Y:
                 f.write(str(x[0]))
@@ -174,3 +177,5 @@ def run(spark_df, seed=42, metric='sil', output_file='heuristic_clustering_outpu
         f.write("\n")
 
     f.flush()
+
+    return algorithm_executor

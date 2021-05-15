@@ -4,7 +4,7 @@ import time
 
 import numpy as np
 
-import Constants
+from Constants import Constants
 
 
 class TL:
@@ -21,12 +21,13 @@ class TL:
 
 
 class MabSolver(TL):
-    def __init__(self, action, time_limit=None):
-        TL.__init__(self, time_limit)
-        self.sum_spendings = [0] * Constants.num_algos
-        self.spendings = [[] for i in range(0, Constants.num_algos)]
+    def __init__(self, action, params=None):
+        TL.__init__(self, params.tuner_timeout)
+        self.params = params
+        self.sum_spendings = [0] * self.params.num_algos
+        self.spendings = [[] for i in range(0, self.params.num_algos)]
         self.action = action
-        self.time_limit = time_limit
+        self.time_limit = params.tuner_timeout
 
     @abc.abstractmethod
     def draw(self):
@@ -43,6 +44,7 @@ class MabSolver(TL):
         return 0
 
     def iteration(self, iteration_number, f, current_time=0):
+        # choosing arm
         cur_arm = self.draw()
         start = time.time()
         # CALL ARM here:
@@ -50,7 +52,9 @@ class MabSolver(TL):
         reward = self.action.apply(cur_arm, f, iteration_number, self.time_remaining, current_time)
         consumed = time.time() - start
         self.consume_limit(consumed)
+        # Time spent on each algo
         self.sum_spendings[cur_arm] += consumed
+        # all spendings
         self.spendings[cur_arm].append(consumed)
         self.register_action(cur_arm, consumed, reward)
 
@@ -69,9 +73,9 @@ class MabSolver(TL):
         return its
 
     @staticmethod
-    def u_correction(sum_spendings):
+    def u_correction(sum_spendings, num_algos):
         sp = np.add(sum_spendings, 1)
         T = np.sum(np.log(sp))
-        numerator = math.sqrt(2 * math.log(Constants.num_algos + T))
+        numerator = math.sqrt(2 * math.log(num_algos + T))
         denom = np.sqrt(1 + np.log(sp))
         return numerator / denom
