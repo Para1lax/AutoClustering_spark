@@ -75,8 +75,8 @@ def configure_mab_solver(data, seed, metric, algorithm):
     :param algorithm: algorithm to be used.
     """
     # algorithm.startswith("rfrsls-ucb-SRSU"):
-    algorithm_executor = RLrfAlgoEx(data=data, metric=metric, seed=seed, batch_size=batch_size, expansion=100)
-    mab_solver = UCBsrsu(action=algorithm_executor, time_limit=time_limit)
+    algorithm_executor = RLrfAlgoEx(data=data, metric=metric, seed=seed, batch_size=Constants.batch_size, expansion=100)
+    mab_solver = UCBsrsu(action=algorithm_executor, time_limit=Constants.time_limit)
 
     return mab_solver
 
