@@ -76,7 +76,6 @@ def configure_mab_solver(data, seed=42, metric='sil', output_file='heuristic_clu
     Creates and configures the corresponding MAB-solver.
     :param algorithm: algorithm to be used.
     """
-    debugging_printer("configure_mab_solver -> RLrfAlgoEx")
     # algorithm.startswith("rfrsls-ucb-SRSU"):
     algorithm_executor = RLrfAlgoEx(data=data, metric=metric, seed=seed, batch_size=batch_size, expansion=100)
     debugging_printer("configure_mab_solver -> UCBsrsu")
@@ -105,11 +104,7 @@ def run(spark_df, seed=42, metric='sil', output_file='AutoClustering_output.txt'
 
     f = open(file=output_file, mode='a')
 
-    print("DF before preproc")
-    spark_df.show(10)
     spark_df = preprocess(spark_df)
-    print("DF after preproc")
-    spark_df.show(10)
 
     # core part:
     # initializing multi-arm bandit solver:

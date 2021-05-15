@@ -46,7 +46,6 @@ global_trace = {}
 # TODO: change when more metrics arrived
 # TODO: delete prints when found where use metrics
 def metric(data, **kwargs):
-    debugging_printer(place='Metric.py', info_name='DATA', info=data.head())
     try:
         res = -ClusteringEvaluator(predictionCol='labels', distanceMeasure='squaredEuclidean').evaluate(data)
         return res

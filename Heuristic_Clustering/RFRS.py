@@ -61,7 +61,6 @@ class RFRS(object):
 
         processed = 0
 
-        debugging_printer(place='RFRS.py -> optimize', info_name='batch_size', info=self.batch_size)
         while processed < self.batch_size:
             # New configuration generation:
             # X (numpy.ndarray) – configuration vector x instance features

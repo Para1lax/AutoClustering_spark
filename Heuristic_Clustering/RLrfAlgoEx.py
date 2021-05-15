@@ -27,7 +27,6 @@ class RLrfAlgoEx:
 
         # create all clustering threads in advance:
         for i in range(0, Constants.num_algos):
-            debugging_printer("RLthreadRFRS -> "+str(self.clu_algos[i]))
             self.th.append(
                 RLthreadRFRS(data=self.data, algorithm_name=self.clu_algos[i],\
                              metric=self.metric, seed=self.seed, batch_size=self.batch_size, expansion=expansion))
