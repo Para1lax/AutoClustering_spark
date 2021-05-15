@@ -73,11 +73,9 @@ class MabSolver(TL):
         return its
 
     @staticmethod
-    def u_correction(sum_spendings):
-        # looks like we never use it
-        return 15/0
-        # sp = np.add(sum_spendings, 1)
-        # T = np.sum(np.log(sp))
-        # numerator = math.sqrt(2 * math.log(Constants.num_algos + T))
-        # denom = np.sqrt(1 + np.log(sp))
-        # return numerator / denom
+    def u_correction(sum_spendings, num_algos):
+        sp = np.add(sum_spendings, 1)
+        T = np.sum(np.log(sp))
+        numerator = math.sqrt(2 * math.log(num_algos + T))
+        denom = np.sqrt(1 + np.log(sp))
+        return numerator / denom

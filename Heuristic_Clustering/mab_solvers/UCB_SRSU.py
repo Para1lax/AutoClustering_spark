@@ -21,5 +21,5 @@ class UCBsrsu(UCB):
         self.iter += 1
         self.n[arm] += 1
         self.raw_rewards[arm] = reward
-        self.rewards = s_norm(self.raw_rewards) + s_norm(self.u_correction(self.sum_spendings))
+        self.rewards = s_norm(self.raw_rewards) + s_norm(self.u_correction(self.sum_spendings, self.params.num_algos))
 
