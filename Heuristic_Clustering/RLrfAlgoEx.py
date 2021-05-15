@@ -12,24 +12,25 @@ from utils import debugging_printer
 class RLrfAlgoEx:
     clu_algos = Constants.algos
 
-    def __init__(self, data, metric='sil', seed=42, batch_size=Constants.batch_size, expansion=5000):
+    def __init__(self, data, metric='sil', seed=42, params=None, expansion=5000):
         self.metric = metric
         self.data = data
-        self.run_num = np.array([0] * Constants.num_algos)
+        self.run_num = np.array([0] * params.num_algos)
         self.best_val = Constants.best_init
         self.best_param = dict()
         self.best_labels = None
         self.best_algo = ""
         self.seed = seed
-        self.batch_size = batch_size
+        self.batch_size = params.batch_size
+        self.params = params
         self.optimizers = []
         self.th = []
 
         # create all clustering threads in advance:
-        for i in range(0, Constants.num_algos):
+        for i in range(0, self.params.num_algos):
 
             self.th.append(
-                RLthreadRFRS(data=self.data, algorithm_name=self.clu_algos[i],\
+                RLthreadRFRS(data=self.data, algorithm_name=self.clu_algos[i], params=self.params,
                              metric=self.metric, seed=self.seed, batch_size=self.batch_size, expansion=expansion))
             self.optimizers.append(self.th[i].optimizer)
 

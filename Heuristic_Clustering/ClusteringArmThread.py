@@ -21,24 +21,25 @@ from utils import debugging_printer
 
 class ClusteringArmThread:
 
-    def __init__(self, data, algorithm_name, metric, seed):
+    def __init__(self, data, algorithm_name, metric, seed, params):
         self.algorithm_name = algorithm_name
         self.metric = metric
         self.data = data
         self.current_labels = None
+        self.n_clusters_upper_bound = params.n_clusters_upper_bound
         self.value = Constants.bad_cluster
         self.parameters = dict()
         self.seed = seed
         self.configuration_space = ConfigurationSpace()
 
         if algorithm_name == Constants.kmeans_algo:
-            self.configuration_space.add_hyperparameters(self.get_kmeans_configspace())
+            self.configuration_space.add_hyperparameters(self.get_kmeans_configspace(self.n_clusters_upper_bound))
 
         elif algorithm_name == Constants.gm_algo:
-            self.configuration_space.add_hyperparameters(self.get_gaussian_mixture_configspace())
+            self.configuration_space.add_hyperparameters(self.get_gaussian_mixture_configspace(self.n_clusters_upper_bound))
 
         elif algorithm_name == Constants.bisecting_kmeans:
-            self.configuration_space.add_hyperparameters(self.get_bisecting_kmeans_configspace())
+            self.configuration_space.add_hyperparameters(self.get_bisecting_kmeans_configspace(self.n_clusters_upper_bound))
 
     def update_labels(self, configuration):
         if self.algorithm_name == Constants.kmeans_algo:
@@ -81,7 +82,7 @@ class ClusteringArmThread:
         return Metric.metric(self.current_labels)
 
     @staticmethod
-    def get_kmeans_configspace():
+    def get_kmeans_configspace(n_clusters_upper_bound):
         """
         k : number of clusters
         initMode : The initialization algorithm. This can be either "random" to choose random points as initial cluster
@@ -95,7 +96,7 @@ class ClusteringArmThread:
         -----------------
         Tuple of parameters
         """
-        k = UniformIntegerHyperparameter("k", 2, Constants.n_clusters_upper_bound)
+        k = UniformIntegerHyperparameter("k", 2, n_clusters_upper_bound)
         initMode = CategoricalHyperparameter("initMode", ['random', 'k-means||'])
         initSteps = UniformIntegerHyperparameter("initSteps", 1, 5)
         maxIter = UniformIntegerHyperparameter("maxIter", 5, 50)
@@ -103,7 +104,7 @@ class ClusteringArmThread:
         return k, initMode, initSteps, maxIter, distanceMeasure
 
     @staticmethod
-    def get_gaussian_mixture_configspace():
+    def get_gaussian_mixture_configspace(n_clusters_upper_bound):
         """
         k : number of clusters
         aggregationDepth : suggested depth for treeAggregate (>= 2)
@@ -114,13 +115,13 @@ class ClusteringArmThread:
         -------
         Tuple of parameters
         """
-        k = UniformIntegerHyperparameter("k", 2, Constants.n_clusters_upper_bound)
+        k = UniformIntegerHyperparameter("k", 2, n_clusters_upper_bound)
         maxIter = UniformIntegerHyperparameter("maxIter", 5, 50)
         tol = UniformFloatHyperparameter("tol", 1e-6, 0.1)
         return k, maxIter, tol
 
     @staticmethod
-    def get_bisecting_kmeans_configspace():
+    def get_bisecting_kmeans_configspace(n_clusters_upper_bound):
         """
         k : number of clusters
         initSteps : The number of steps for k-means|| initialization mode. Must be > 0
@@ -134,7 +135,7 @@ class ClusteringArmThread:
         -----------------
         Tuple of parameters
         """
-        k = UniformIntegerHyperparameter("k", 2, Constants.n_clusters_upper_bound)
+        k = UniformIntegerHyperparameter("k", 2, n_clusters_upper_bound)
         maxIter = UniformIntegerHyperparameter("maxIter", 5, 50)
         distanceMeasure = CategoricalHyperparameter("distanceMeasure", ['euclidean', 'cosine'])
         minDivisibleClusterSize = UniformFloatHyperparameter("minDivisibleClusterSize", 0.01, 1.0)

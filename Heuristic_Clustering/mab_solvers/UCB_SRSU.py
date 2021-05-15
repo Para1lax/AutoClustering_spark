@@ -9,8 +9,8 @@ s_norm = Softmax.softmax_normalize
 
 
 class UCBsrsu(UCB):
-    def __init__(self, action, is_fair=False, time_limit=None):
-        super().__init__(action, is_fair, time_limit)
+    def __init__(self, action, is_fair=False, params=None):
+        super().__init__(action, is_fair, params)
         self.raw_rewards = []
 
     def initialize(self, f, true_labels=None):

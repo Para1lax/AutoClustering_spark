@@ -7,11 +7,11 @@ from smac.scenario.scenario import Scenario
 
 class RLthreadRFRS(ClusteringArmThread):
     def __init__(self, data: DataFrame, algorithm_name: str, metric: str, seed: int, batch_size: int,
-                 expansion=5000):
+                 expansion=5000, params=None):
         self.run_count = batch_size
         # TODO: rewrite ClusteringArmThread
         ClusteringArmThread.__init__(self, data, algorithm_name, metric,
-                                     seed)  # populates config space
+                                     seed, params=params)  # populates config space
         self.new_scenario(1)  # initial scenario
 
         self.optimizer = RFRS(scenario=self.clu_scenario,

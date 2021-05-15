@@ -7,6 +7,7 @@ from Constants import Constants
 from RLrfAlgoEx import RLrfAlgoEx
 from mab_solvers.UCB_SRSU import UCBsrsu
 from utils import debugging_printer, preprocess
+from Parameters import Parameters
 
 
 # arglabel = None
@@ -69,14 +70,14 @@ from utils import debugging_printer, preprocess
 #     return mab_solver
 
 # checking rfrsls-ucb-SRSU only
-def configure_mab_solver(data, seed, metric, algorithm):
+def configure_mab_solver(data, seed, metric, algorithm, params):
     """
     Creates and configures the corresponding MAB-solver.
     :param algorithm: algorithm to be used.
     """
     # algorithm.startswith("rfrsls-ucb-SRSU"):
     algorithm_executor = RLrfAlgoEx(data=data, metric=metric, seed=seed, batch_size=Constants.batch_size, expansion=100)
-    mab_solver = UCBsrsu(action=algorithm_executor, time_limit=Constants.tuner_timeout)
+    mab_solver = UCBsrsu(action=algorithm_executor, params=params)
 
     return mab_solver
 
@@ -90,17 +91,11 @@ def configure_mab_solver(data, seed, metric, algorithm):
 # iterations = Constants.bandit_iterations
 # # iterations = 5000
 def run(spark_df, seed=42, metric='sil', output_file='AutoClustering_output.txt', algorithm=Constants.algorithm,
-        batch_size=Constants.batch_size, timeout=Constants.bandit_timeout, iterations=Constants.bandit_iterations,
-        max_clusters=Constants.n_clusters_upper_bound, algorithms=Constants.algos):
+        batch_size=40, timeout=30, iterations=40, max_clusters=15, algorithms=Constants.algos):
     true_labels = None
 
-    Constants.algorithm = algorithm
-    Constants.num_algos = len(algorithms)
-    Constants.batch_size = Constants.batch_size
-    Constants.bandit_timeout = timeout
-    Constants.bandit_iterations = iterations
-    Constants.n_clusters_upper_bound = max_clusters
-    Constants.tuner_timeout = timeout * (iterations + 1) / Constants.num_algos
+    params = Parameters(algorithms=algorithms, n_clusters_upper_bound=max_clusters,
+                        bandit_timeout=timeout, bandit_iterations=iterations, batch_size=batch_size)
 
     f = open(file=output_file, mode='a')
 
@@ -108,7 +103,7 @@ def run(spark_df, seed=42, metric='sil', output_file='AutoClustering_output.txt'
 
     # core part:
     # initializing multi-arm bandit solver:
-    mab_solver = configure_mab_solver(spark_df, algorithm=algorithm, metric=metric, seed=seed)
+    mab_solver = configure_mab_solver(spark_df, algorithm=algorithm, metric=metric, seed=seed, params=params)
 
     start = time.time()
 

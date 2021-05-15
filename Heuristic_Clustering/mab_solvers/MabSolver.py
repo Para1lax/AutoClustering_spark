@@ -21,12 +21,13 @@ class TL:
 
 
 class MabSolver(TL):
-    def __init__(self, action, time_limit=None):
-        TL.__init__(self, time_limit)
-        self.sum_spendings = [0] * Constants.num_algos
-        self.spendings = [[] for i in range(0, Constants.num_algos)]
+    def __init__(self, action, params=None):
+        TL.__init__(self, params.tuner_timeout)
+        self.params = params
+        self.sum_spendings = [0] * self.params.num_algos
+        self.spendings = [[] for i in range(0, self.params.num_algos)]
         self.action = action
-        self.time_limit = time_limit
+        self.time_limit = params.tuner_timeout
 
     @abc.abstractmethod
     def draw(self):
@@ -73,8 +74,10 @@ class MabSolver(TL):
 
     @staticmethod
     def u_correction(sum_spendings):
-        sp = np.add(sum_spendings, 1)
-        T = np.sum(np.log(sp))
-        numerator = math.sqrt(2 * math.log(Constants.num_algos + T))
-        denom = np.sqrt(1 + np.log(sp))
-        return numerator / denom
+        # looks like we never use it
+        return 15/0
+        # sp = np.add(sum_spendings, 1)
+        # T = np.sum(np.log(sp))
+        # numerator = math.sqrt(2 * math.log(Constants.num_algos + T))
+        # denom = np.sqrt(1 + np.log(sp))
+        # return numerator / denom

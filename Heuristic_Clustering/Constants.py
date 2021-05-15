@@ -14,13 +14,13 @@ class Constants:
     # bgm_algo = "Bayesian_Gaussian_Mixture"
     bisecting_kmeans = "BisectingKMeans"
 
-    num_algos = 3
-
-    n_clusters_upper_bound = 15
-    bandit_timeout = 30  # 5 # seconds for each bandit iteration
-    bandit_iterations = 40  # 10 # iterations number
-    batch_size = 40
-    tuner_timeout = bandit_timeout * (bandit_iterations + 1) / num_algos
+    # num_algos = 3
+    #
+    # n_clusters_upper_bound = 15
+    # bandit_timeout = 30  # 5 # seconds for each bandit iteration
+    # bandit_iterations = 40  # 10 # iterations number
+    # batch_size = 40
+    # tuner_timeout = bandit_timeout * (bandit_iterations + 1) / num_algos
 
     smac_temp_dir = "/tmp/rm_me/"
 
