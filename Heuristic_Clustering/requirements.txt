@@ -12,3 +12,30 @@ pynisher==0.4
 pyrfr==0.6.1
 smac==0.6.0
 pulp==1.6.0
+
+# !apt-get update
+# !apt-get upgrade
+# !conda install gxx_linux-64 gcc_linux-64
+# !curl https://raw.githubusercontent.com/automl/smac3/master/requirements.txt | xargs -n 1 -L 1 pip install
+# !sudo apt-get install build-essential swig
+# !pip install matplotlib
+# !pip install pretty_errors
+# !pip install numpy
+# !pip install pandas
+# !pip install pyparsing
+# !pip install scikit-learn
+# !pip install scipy
+# !pip install six
+# !pip install cycler
+# !pip install python-dateutil
+# !pip install pynisher
+# !pip install pyrfr
+# !pip install pulp
+# !pip install wget
+# !pip install pandas
+# !pip install matplotlib
+# # !pip install smac
+# # !sudo apt-get install build-essential
+# !pip install ConfigSpace
+# !pip install smac==0.13.1
+# !pip install graphframes
