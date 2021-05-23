@@ -6,6 +6,7 @@ import numpy as np
 from Constants import Constants
 from RLrfAlgoEx import RLrfAlgoEx
 from mab_solvers.UCB_SRSU import UCBsrsu
+from mab_solvers.Softmax import Softmax
 from utils import debugging_printer, preprocess
 from Parameters import Parameters
 
@@ -38,7 +39,7 @@ from Parameters import Parameters
 #         mab_solver = Uniform(action=algo_e, time_limit=time_limit)
 #     elif algorithm.startswith("rfrsls-smx-R"):
 #         algo_e = RLrfrsAlgoEx(metric, X, seed, batch_size, expansion=100)
-#         mab_solver = SoftmaxR(action=algo_e, time_limit=time_limit)
+#         mab_solver = SoftmaxR(action=algo_e, time_limsmxit=time_limit)
 #     elif algorithm.startswith("rfrsls-ucb-SRU"):
 #         algo_e = RLrfrsAlgoEx(metric, X, seed, batch_size, expansion=100)
 #         mab_solver = UCBsru(action=algo_e, time_limit=time_limit)
@@ -75,10 +76,13 @@ def configure_mab_solver(data, seed, metric, algorithm, params):
     Creates and configures the corresponding MAB-solver.
     :param algorithm: algorithm to be used.
     """
-    # algorithm.startswith("rfrsls-ucb-SRSU"):
     algorithm_executor = RLrfAlgoEx(data=data, metric=metric, seed=seed, params=params, expansion=100)
-    mab_solver = UCBsrsu(action=algorithm_executor, params=params)
-
+    if algorithm=='ucb':
+        mab_solver = UCBsrsu(action=algorithm_executor, params=params)
+    elif algorithm=='softmax':
+        mab_solver = Softmax(action=algorithm_executor, params=params)
+    else:
+        raise ValueError('Wrong algorithm. Algorithm should be \'ucb\' or \'softmax\'')
     return mab_solver
 
 
@@ -106,6 +110,7 @@ def run(spark_df, seed=42, metric='sil', output_file='AutoClustering_output.txt'
     iterations
     max_clusters
     algorithms
+    algorithm : 'ucb' or 'softmax'
 
     Returns
     -------
