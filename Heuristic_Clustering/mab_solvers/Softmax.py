@@ -1,18 +1,20 @@
 import numpy as np
 from numpy.random import choice
 
-import Constants
-import Metric
+from pyspark.sql.functions import *
+from pyspark.sql.types import IntegerType
+
+from Metric import metric
 from mab_solvers.MabSolver import MabSolver
 
 
 class Softmax(MabSolver):
-    def __init__(self, action, tau, is_fair=False, time_limit=None):
-        MabSolver.__init__(self, action, time_limit)
-        num = Constants.num_algos
-        self.rewards = np.array([0.0] * num)
-        self.n = np.array([0] * num)
-        self.tau = tau
+    def __init__(self, action, params, is_fair=True):
+        MabSolver.__init__(self, action, params)
+        self.num_algos = params.num_algos
+        self.rewards = np.zeros(params.num_algos)
+        self.n = np.array([1] * self.num_algos)
+        self.tau = params.tau
         self.is_fair = is_fair
         # self.name = "softmax" + str(tau * 10)
 
@@ -39,34 +41,36 @@ class Softmax(MabSolver):
     #     # Because no actual clustering is involved, just random values
     #     # self.consume_limit(time.time() - start)
 
-    def initialize(self, f, true_labels=None):
+    def initialize(self, log_file, true_labels=None):
         """
         Initialize rewards. We use here the same value,
         gained by calculating metrics on randomly assigned labels.
         """
         print("\nInit Softmax with tau = " + str(self.tau))
-        n_clusters = Constants.n_clusters_upper_bound
-        labels = np.random.randint(0, n_clusters, len(self.action.X))
-        for c in range(0, n_clusters):
-            labels[c] = c
-        np.random.shuffle(labels)
-        res = Metric.metric(self.action.X, n_clusters, labels, self.action.metric, true_labels)
-
+        self.action.data = self.action.data.withColumn('labels', round(rand()*self.params.n_clusters_upper_bound)\
+                                                       .cast(IntegerType()))
+        res = metric(self.action.data)
         # start = time.time()
-        for i in range(0, Constants.num_algos):
+        for i in range(0, self.params.num_algos):
             self.rewards[i] = -res  # the smallest value is, the better.
         # self.consume_limit(time.time() - start)
-        f.write("Init rewards: " + str(self.rewards) + '\n')
+        log_file.write("Init rewards: " + str(self.rewards) + '\n')
 
     def draw(self):
         if not self.is_fair:
             s_max = self.softmax_normalize(self.rewards)
         else:
             x = np.array(self.rewards)
-            x = x / (self.sum_spendings / self.n)
+            # print("SMX -> DRAW: x={}".format(x))
+            # print("SMX -> DRAW: self.sum_spendings={}".format(self.sum_spendings))
+            s_max = x / (self.sum_spendings / self.n)
             s_max = self.softmax_normalize(x)
 
-        d = choice([i for i in range(0, Constants.num_algos)], p=s_max)
+        print("SMX -> DRAW: s_max={}".format(s_max))
+        try:
+          d = choice([i for i in range(0, self.params.num_algos)], p=s_max)
+        except ValueError:
+          d = choice([i for i in range(0, self.params.num_algos)])
         return d
 
     def register_action(self, arm, time_consumed, reward):

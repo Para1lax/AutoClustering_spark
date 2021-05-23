@@ -3,7 +3,8 @@ from Constants import Constants
 
 class Parameters:
     def __init__(self, algorithms=Constants.algos, n_clusters_upper_bound=15,
-                 bandit_timeout=30, bandit_iterations=40, batch_size=40):
+                 bandit_timeout=30, bandit_iterations=40, batch_size=40,
+                 MAB_solver='ucb', tau=0.5):
         self.algorithms = algorithms
         self.num_algos = len(self.algorithms)
         self.n_clusters_upper_bound = n_clusters_upper_bound
@@ -13,3 +14,5 @@ class Parameters:
         self.bandit_iterations = bandit_iterations
         self.batch_size = batch_size
         self.tuner_timeout = bandit_timeout * (bandit_iterations + 1) / self.num_algos
+        self.MAB_solver = MAB_solver
+        self.tau = tau
