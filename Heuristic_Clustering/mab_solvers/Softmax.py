@@ -61,12 +61,9 @@ class Softmax(MabSolver):
             s_max = self.softmax_normalize(self.rewards)
         else:
             x = np.array(self.rewards)
-            # print("SMX -> DRAW: x={}".format(x))
-            # print("SMX -> DRAW: self.sum_spendings={}".format(self.sum_spendings))
-            s_max = x / (self.sum_spendings / self.n)
+            x = x / (self.sum_spendings / self.n)
             s_max = self.softmax_normalize(x)
 
-        print("SMX -> DRAW: s_max={}".format(s_max))
         try:
           d = choice([i for i in range(0, self.params.num_algos)], p=s_max)
         except ValueError:

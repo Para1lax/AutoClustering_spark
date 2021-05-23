@@ -22,6 +22,8 @@ class Constants:
     # batch_size = 40
     # tuner_timeout = bandit_timeout * (bandit_iterations + 1) / num_algos
 
+    max_no_improvement_iterations = 6
+
     smac_temp_dir = "/tmp/rm_me/"
 
     algos = [

@@ -23,12 +23,12 @@ class RLrfAlgoEx:
         self.seed = seed
         self.batch_size = params.batch_size
         self.params = params
+        self.same_res_counter = 0
         self.optimizers = []
         self.th = []
 
         # create all clustering threads in advance:
         for i in range(0, self.params.num_algos):
-
             self.th.append(
                 RLthreadRFRS(data=self.data, algorithm_name=self.clu_algos[i], params=self.params,
                              metric=self.metric, seed=self.seed, batch_size=self.batch_size, expansion=expansion))
@@ -55,6 +55,9 @@ class RLrfAlgoEx:
             self.best_param = th.parameters
             self.best_algo = th.algorithm_name
             self.best_labels = th.current_labels
+            self.same_res_counter = 0
+        else:
+            self.same_res_counter += 1
         log_string = str(iteration_number) \
                      + ', ' + self.metric \
                      + ', ' + str(self.best_val) \
@@ -65,6 +68,8 @@ class RLrfAlgoEx:
 
         file.write(log_string + '\n')
         file.flush()
+        if self.same_res_counter >= Constants.max_no_improvement_iterations:
+            return None
 
         # best value in random forest if the smallest one. Algo Executor provides the REWARD.
         # The smaller value is, the better reward should be.

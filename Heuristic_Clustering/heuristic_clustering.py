@@ -137,6 +137,7 @@ def run(spark_df, seed=42, metric='sil', output_file='AutoClustering_output.txt'
 
     start = time.time()
 
+    f.write("iteration_number, metric, best_val, best_algo, algo, reward, time\n")
     # RUN actual Multi-Arm:
     its = mab_solver.iterate(iterations, f)
     time_iterations = time.time() - start

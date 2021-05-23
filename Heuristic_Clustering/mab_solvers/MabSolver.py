@@ -50,6 +50,8 @@ class MabSolver(TL):
         # CALL ARM here:
         # the last arm call will be cut off if time limit exceeded.
         reward = self.action.apply(cur_arm, f, iteration_number, self.time_remaining, current_time)
+        if reward is None:
+            return None
         consumed = time.time() - start
         self.consume_limit(consumed)
         # Time spent on each algo
@@ -57,6 +59,7 @@ class MabSolver(TL):
         # all spendings
         self.spendings[cur_arm].append(consumed)
         self.register_action(cur_arm, consumed, reward)
+        return reward
 
     def iterate(self, iterations, log_file):
         start = time.time()
@@ -66,8 +69,10 @@ class MabSolver(TL):
                 print("Limit of " + str(self.time_limit) + "s exceeded. No action will be performed on iteration "
                       + str(i) + "\n")
                 break
-            self.iteration(i, log_file, int(time.time()-start))
+            reward = self.iteration(i, log_file, int(time.time()-start))
             its = its + 1
+            if reward is None:
+                break
 
         print("#PROFILE: total time consumed by " + str(its) + "iterations: " + str(time.time() - start))
         return its
