@@ -36,11 +36,11 @@ def run(spark_df, spark_context=None, metric='sil', output_file='AutoClustering_
     Parameters
     ----------
     spark_df : Spark dataframe
+    spark_context : Main entry point for Spark functionality
     metric : One of realized metrics
     output_file : Path to file where you want to see logs
     batch_size : processed configurations at one time
     timeout : Seconds for each bandit iteration
-    iterations
     max_clusters
     algorithms
     algorithm : 'ucb' or 'softmax'
