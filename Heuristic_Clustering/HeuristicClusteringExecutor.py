@@ -2,6 +2,7 @@
 
 import time
 import numpy as np
+from pyspark import SparkContext, SparkConf
 
 from Constants import Constants
 from RLrfAlgoEx import RLrfAlgoEx
@@ -11,72 +12,13 @@ from utils import debugging_printer, preprocess
 from Parameters import Parameters
 
 
-# arglabel = None
-# if len(argv) == 7:
-#     script, argfile, argseed, argmetric, argiter, argbatch, argtl = argv
-#     algorithm = Constants.algorithm
-# elif len(argv) == 8:
-#     script, argfile, argseed, argmetric, argiter, argbatch, argtl, algorithm = argv
-# elif len(argv) == 9:
-#     script, argfile, argseed, argmetric, arglabel, argiter, argbatch, argtl, algorithm = argv
-# else:
-#     raise "Invalid error"
 
-
-# def configure_mab_solver(algorithm, metric, X, seed):
-#     """
-#     Creates and configures the corresponding MAB-solver.
-#     :param algorithm: algorithm to be used.
-#     """
-#
-#     if algorithm.startswith("rl-ei"):
-#         algo_e = RLsmacEiAlgoEx(metric, X, seed, batch_size)
-#         mab_solver = Softmax(action=algo_e, tau=Constants.tau, is_fair=False, time_limit=time_limit)
-#
-#         # Advanced MAB:
-#     elif algorithm.startswith("rfrsls-uni"):
-#         algo_e = RLrfrsAlgoEx(metric, X, seed, batch_size, expansion=100)
-#         mab_solver = Uniform(action=algo_e, time_limit=time_limit)
-#     elif algorithm.startswith("rfrsls-smx-R"):
-#         algo_e = RLrfrsAlgoEx(metric, X, seed, batch_size, expansion=100)
-#         mab_solver = SoftmaxR(action=algo_e, time_limsmxit=time_limit)
-#     elif algorithm.startswith("rfrsls-ucb-SRU"):
-#         algo_e = RLrfrsAlgoEx(metric, X, seed, batch_size, expansion=100)
-#         mab_solver = UCBsru(action=algo_e, time_limit=time_limit)
-#     elif algorithm.startswith("rfrsls-ucb-SRSU"):
-#         algo_e = RLrfrsAlgoEx(metric, X, seed, batch_size, expansion=100)
-#         mab_solver = UCBsrsu(action=algo_e, time_limit=time_limit)
-#     elif algorithm.startswith("rfrsls-smx-SRSU"):
-#         algo_e = RLrfrsAlgoEx(metric, X, seed, batch_size, expansion=100)
-#         mab_solver = SoftmaxSRSU(action=algo_e, time_limit=time_limit)
-#
-#         # Old MABs still supported
-#     else:
-#         algo_e = ae.RLsmacAlgoEx(metric, X, seed, batch_size)
-#         # choose algo:
-#         if algorithm == "rl-ucb-f-smac":
-#             mab_solver = UCB(action=algo_e, is_fair=True, time_limit=time_limit)
-#         elif algorithm == "rl-ucb1-smac":
-#             mab_solver = UCB(action=algo_e, is_fair=False, time_limit=time_limit)
-#         elif algorithm.startswith("rl-smx-smac"):
-#             mab_solver = Softmax(action=algo_e, tau=Constants.tau, is_fair=False, time_limit=time_limit)
-#         elif algorithm == "rl-smx-f-smac":
-#             mab_solver = Softmax(action=algo_e, tau=Constants.tau, is_fair=True, time_limit=time_limit)
-#         # elif argalgo == "rl-ucb1-rs":
-#         elif algorithm.startswith("rl-max-ei"):
-#             mab_solver = MaxEi(action=algo_e, optimizers=algo_e.smacs, time_limit=time_limit)
-#         else:
-#             raise "X3 algo: " + algorithm
-#
-#     return mab_solver
-
-# checking rfrsls-ucb-SRSU only
-def configure_mab_solver(data, seed, metric, algorithm, params):
+def configure_mab_solver(data, metric, algorithm, params):
     """
     Creates and configures the corresponding MAB-solver.
     :param algorithm: algorithm to be used.
     """
-    algorithm_executor = RLrfAlgoEx(data=data, metric=metric, seed=seed, params=params, expansion=100)
+    algorithm_executor = RLrfAlgoEx(data=data, metric=metric, params=params, expansion=100)
     if algorithm=='ucb':
         mab_solver = UCBsrsu(action=algorithm_executor, params=params)
     elif algorithm=='softmax':
@@ -86,7 +28,7 @@ def configure_mab_solver(data, seed, metric, algorithm, params):
     return mab_solver
 
 
-def run(spark_df, seed=42, metric='sil', output_file='AutoClustering_output.txt', batch_size=40, timeout=30,
+def run(spark_df, spark_context=None, metric='sil', output_file='AutoClustering_output.txt', batch_size=40, timeout=30,
         time_limit=1000, max_clusters=15, algorithms=Constants.algos, algorithm=Constants.algorithm):
     """
     Performs searching for best clustering algorithm and its configuration
@@ -94,7 +36,6 @@ def run(spark_df, seed=42, metric='sil', output_file='AutoClustering_output.txt'
     Parameters
     ----------
     spark_df : Spark dataframe
-    seed : Random seed value
     metric : One of realized metrics
     output_file : Path to file where you want to see logs
     batch_size : processed configurations at one time
@@ -110,7 +51,10 @@ def run(spark_df, seed=42, metric='sil', output_file='AutoClustering_output.txt'
 
     true_labels = None
 
-    params = Parameters(algorithms=algorithms, n_clusters_upper_bound=max_clusters,
+    if spark_context is None:
+        spark_context = SparkContext.getOrCreate(SparkConf().setMaster("local[*]"))
+
+    params = Parameters(spark_context, algorithms=algorithms, n_clusters_upper_bound=max_clusters,
                         bandit_timeout=timeout, time_limit=time_limit, batch_size=batch_size)
 
     f = open(file=output_file, mode='a')
@@ -119,7 +63,7 @@ def run(spark_df, seed=42, metric='sil', output_file='AutoClustering_output.txt'
 
     # core part:
     # initializing multi-arm bandit solver:
-    mab_solver = configure_mab_solver(spark_df, algorithm=algorithm, metric=metric, seed=seed, params=params)
+    mab_solver = configure_mab_solver(spark_df, algorithm=algorithm, metric=metric, params=params)
 
     start = time.time()
 

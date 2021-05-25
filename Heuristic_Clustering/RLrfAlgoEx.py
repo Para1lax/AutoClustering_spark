@@ -12,7 +12,7 @@ from utils import debugging_printer
 class RLrfAlgoEx:
     clu_algos = Constants.algos
 
-    def __init__(self, data, metric='sil', seed=42, params=None, expansion=5000):
+    def __init__(self, data, metric='sil', params=None, expansion=5000):
         self.metric = metric
         self.data = data
         self.run_num = np.array([0] * params.num_algos)
@@ -20,7 +20,6 @@ class RLrfAlgoEx:
         self.best_param = dict()
         self.best_labels = None
         self.best_algo = ""
-        self.seed = seed
         self.batch_size = params.batch_size
         self.params = params
         self.same_res_counter = 0
