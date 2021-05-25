@@ -4,8 +4,6 @@ import time
 
 import numpy as np
 
-from ..utils import print_log
-
 class TL:
     def __init__(self, time_limit):
         self.time_remaining = time_limit
