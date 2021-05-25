@@ -67,7 +67,7 @@ class RLrfAlgoEx:
 
         file.write(log_string + '\n')
         file.flush()
-        if self.same_res_counter >= Constants.max_no_improvement_iterations:
+        if self.same_res_counter >= self.params.max_no_improvement_iterations:
             return None
 
         # best value in random forest if the smallest one. Algo Executor provides the REWARD.

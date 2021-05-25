@@ -29,7 +29,8 @@ def configure_mab_solver(data, metric, algorithm, params):
 
 
 def run(spark_df, spark_context=None, metric='sil', output_file='AutoClustering_output.txt', batch_size=40, timeout=30,
-        time_limit=1000, max_clusters=15, algorithms=Constants.algos, algorithm=Constants.algorithm):
+        time_limit=1000, max_clusters=15, algorithms=Constants.algos, algorithm=Constants.algorithm, tau = 0.5,
+        max_no_improvement_iterations=10):
     """
     Performs searching for best clustering algorithm and its configuration
 
@@ -55,7 +56,8 @@ def run(spark_df, spark_context=None, metric='sil', output_file='AutoClustering_
         spark_context = SparkContext.getOrCreate(SparkConf().setMaster("local[*]"))
 
     params = Parameters(spark_context, algorithms=algorithms, n_clusters_upper_bound=max_clusters,
-                        bandit_timeout=timeout, time_limit=time_limit, batch_size=batch_size)
+                        bandit_timeout=timeout, time_limit=time_limit, batch_size=batch_size, tau=tau,
+                        max_no_improvement_iterations=None)
 
     f = open(file=output_file, mode='a')
 
