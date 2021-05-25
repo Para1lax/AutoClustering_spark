@@ -131,7 +131,7 @@ def run(spark_df, seed=42, metric='sil', output_file='AutoClustering_output.txt'
 
     f.write("iteration_number, metric, best_val, best_algo, algo, reward, time\n")
     # RUN actual Multi-Arm:
-    its = mab_solver.iterate(iterations, f)
+    its = mab_solver.iterate(f)
     time_iterations = time.time() - start
 
     print("#PROFILE: time spent in initialize: " + str(time_init))
