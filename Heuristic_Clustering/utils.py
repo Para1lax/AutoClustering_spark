@@ -1,21 +1,21 @@
 from Constants import DEBUG, DEBUG_PREFIX
 
-try:
-    from pyspark import SparkContext, SparkConf
-    from pyspark.sql import SparkSession
-except ImportError as e:
-    print('<<<<<!!!!! Please restart your kernel after installing Apache Spark !!!!!>>>>>')
-sc = SparkContext.getOrCreate(SparkConf().setMaster("local[*]"))
-
-spark = SparkSession \
-    .builder \
-    .getOrCreate()
+# try:
+#     from pyspark import SparkContext, SparkConf
+#     from pyspark.sql import SparkSession
+# except ImportError as e:
+#     print('<<<<<!!!!! Please restart your kernel after installing Apache Spark !!!!!>>>>>')
+# sc = SparkContext.getOrCreate(SparkConf().setMaster("local[*]"))
+#
+# spark = SparkSession \
+#     .builder \
+#     .getOrCreate()
 
 from pyspark.sql.types import *
 from pyspark.sql import SQLContext
 from pyspark.ml.feature import OneHotEncoder, StringIndexer, VectorAssembler, Normalizer
 
-sqlCtx = SQLContext(sc)
+# sqlCtx = SQLContext(sc)
 
 
 #preprocessing data for spark
@@ -49,14 +49,14 @@ def define_structure(string, format_type):
 
 
 # Given pandas dataframe, it will return a spark's dataframe.
-def pandas_to_spark(pandas_df):
+def pandas_to_spark(spark_sql_context, pandas_df):
     columns = list(pandas_df.columns)
     types = list(pandas_df.dtypes)
     struct_list = []
     for column, typo in zip(columns, types):
         struct_list.append(define_structure(column, typo))
     p_schema = StructType(struct_list)
-    return sqlCtx.createDataFrame(pandas_df, p_schema)
+    return spark_sql_context.createDataFrame(pandas_df, p_schema)
 
 
 def debugging_printer(place, info_name=None, info=None):

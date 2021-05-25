@@ -61,18 +61,25 @@ class MabSolver(TL):
         self.register_action(cur_arm, consumed, reward)
         return reward
 
-    def iterate(self, iterations, log_file):
+    def iterate(self, log_file):
         start = time.time()
         its = 0
-        for i in range(1, iterations + 1):
-            if self.is_limit_exceeded():
-                print("Limit of " + str(self.time_limit) + "s exceeded. No action will be performed on iteration "
-                      + str(i) + "\n")
-                break
-            reward = self.iteration(i, log_file, int(time.time()-start))
-            its = its + 1
+        # for i in range(1, iterations + 1):
+        #     if self.is_limit_exceeded():
+        #         print("Limit of " + str(self.time_limit) + "s exceeded. No action will be performed on iteration "
+        #               + str(i) + "\n")
+        #         break
+        #     reward = self.iteration(i, log_file, int(time.time()-start))
+        #     its = its + 1
+        #     if reward is None:
+        #         break
+        while not self.is_limit_exceeded():
+            reward = self.iteration(its, log_file, int(time.time()-start))
+            its += 1
             if reward is None:
                 break
+        print("Limit of " + str(self.time_limit) + "s exceeded. No action will be performed on iteration "
+                      + str(its) + "\n")
 
         print("#PROFILE: total time consumed by " + str(its) + "iterations: " + str(time.time() - start))
         return its

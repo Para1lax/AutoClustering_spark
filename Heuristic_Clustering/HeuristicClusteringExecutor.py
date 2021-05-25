@@ -86,16 +86,8 @@ def configure_mab_solver(data, seed, metric, algorithm, params):
     return mab_solver
 
 
-# algorithm = Constants.algorithm
-# # algorithm = 'rl-ei'
-# batch_size = Constants.batch_size
-# # batch_size = 1200
-# time_limit = Constants.tuner_timeout
-# # time_limit = 1000
-# iterations = Constants.bandit_iterations
-# # iterations = 5000
 def run(spark_df, seed=42, metric='sil', output_file='AutoClustering_output.txt', batch_size=40, timeout=30,
-        iterations=40, max_clusters=15, algorithms=Constants.algos, algorithm=Constants.algorithm):
+        time_limit=1000, max_clusters=15, algorithms=Constants.algos, algorithm=Constants.algorithm):
     """
     Performs searching for best clustering algorithm and its configuration
 
@@ -119,7 +111,7 @@ def run(spark_df, seed=42, metric='sil', output_file='AutoClustering_output.txt'
     true_labels = None
 
     params = Parameters(algorithms=algorithms, n_clusters_upper_bound=max_clusters,
-                        bandit_timeout=timeout, bandit_iterations=iterations, batch_size=batch_size)
+                        bandit_timeout=timeout, time_limit=time_limit, batch_size=batch_size)
 
     f = open(file=output_file, mode='a')
 

@@ -1,9 +1,3 @@
-import threading
-import traceback
-
-import numpy as np
-import sys
-from ConfigSpace.conditions import InCondition
 from ConfigSpace.hyperparameters import CategoricalHyperparameter, \
     UniformFloatHyperparameter, UniformIntegerHyperparameter, Constant
 
@@ -12,11 +6,9 @@ from pyspark.ml.clustering import GaussianMixture as GaussianMixture_spark
 from pyspark.ml.clustering import BisectingKMeans as BisectingKMeans_spark
 
 from smac.configspace import ConfigurationSpace
-from pyspark.ml.feature import VectorAssembler
 
 from Constants import Constants
 import Metric
-from utils import debugging_printer
 
 
 class ClusteringArmThread:
