@@ -49,14 +49,15 @@ def define_structure(string, format_type):
 
 
 # Given pandas dataframe, it will return a spark's dataframe.
-def pandas_to_spark(spark_sql_context, pandas_df):
+def pandas_to_spark(sparkContext, pandas_df):
+    sqlCtx = SQLContext(sparkContext)
     columns = list(pandas_df.columns)
     types = list(pandas_df.dtypes)
     struct_list = []
     for column, typo in zip(columns, types):
         struct_list.append(define_structure(column, typo))
     p_schema = StructType(struct_list)
-    return spark_sql_context.createDataFrame(pandas_df, p_schema)
+    return sqlCtx.createDataFrame(pandas_df, p_schema)
 
 
 def debugging_printer(place, info_name=None, info=None):

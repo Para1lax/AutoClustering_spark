@@ -4,7 +4,6 @@ import numpy as np
 from pyspark.sql.functions import *
 from pyspark.sql.types import IntegerType
 
-from Constants import Constants
 import Metric
 from mab_solvers.MabSolver import MabSolver
 from utils import debugging_printer
