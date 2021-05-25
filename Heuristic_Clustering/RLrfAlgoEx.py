@@ -62,7 +62,7 @@ class RLrfAlgoEx:
                          reward, current_time + run_spent]
         self.params.result['iterations'] = self.params.result['iterations'] + log_iteration
 
-        print_log(', '.join([str(s) for s in log_iteration])+'\n')
+        print_log(file, ', '.join([str(s) for s in log_iteration])+'\n')
         # log_string = str(iteration_number) \
         #              + ', ' + self.metric \
         #              + ', ' + str(self.best_val) \
