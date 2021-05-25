@@ -15,10 +15,15 @@ from pyspark.sql.types import *
 from pyspark.sql import SQLContext
 from pyspark.ml.feature import OneHotEncoder, StringIndexer, VectorAssembler, Normalizer
 
+
 # sqlCtx = SQLContext(sc)
 
+def print_log(f, s):
+    if not f is None:
+        f.write(s)
 
-#preprocessing data for spark
+
+# preprocessing data for spark
 # TODO: OneHotEncoder, StringIndexer (maybe)
 def preprocess(data):
     vectorAssembler = VectorAssembler(inputCols=data.columns,
@@ -73,4 +78,3 @@ def debugging_printer(place, info_name=None, info=None):
                {}:  \n{}\n \
                \n \
                ==========================".format(place, info_name, info))
-

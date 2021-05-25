@@ -4,6 +4,8 @@ import time
 
 import numpy as np
 
+from ..utils import print_log
+
 class TL:
     def __init__(self, time_limit):
         self.time_remaining = time_limit
@@ -75,10 +77,10 @@ class MabSolver(TL):
             its += 1
             if reward is None:
                 break
-        print("Limit of " + str(self.time_limit) + "s exceeded. No action will be performed on iteration "
-                      + str(its) + "\n")
-
-        print("#PROFILE: total time consumed by " + str(its) + "iterations: " + str(time.time() - start))
+        # print("Limit of " + str(self.time_limit) + "s exceeded. No action will be performed on iteration "
+        #               + str(its) + "\n")
+        #
+        # print("#PROFILE: total time consumed by " + str(its) + "iterations: " + str(time.time() - start))
         return its
 
     @staticmethod

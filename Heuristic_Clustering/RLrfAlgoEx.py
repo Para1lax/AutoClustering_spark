@@ -4,9 +4,9 @@ import numpy as np
 
 from sklearn.ensemble import RandomForestRegressor
 
-from Constants import Constants
-from RLthreadRFRS import RLthreadRFRS
-from utils import debugging_printer
+from .Constants import Constants
+from .RLthreadRFRS import RLthreadRFRS
+from .utils import print_log
 
 
 class RLrfAlgoEx:
@@ -57,15 +57,21 @@ class RLrfAlgoEx:
             self.same_res_counter = 0
         else:
             self.same_res_counter += 1
-        log_string = str(iteration_number) \
-                     + ', ' + self.metric \
-                     + ', ' + str(self.best_val) \
-                     + ', ' + str(self.best_algo) \
-                     + ', ' + str(self.clu_algos[arm]) \
-                     + ', ' + str(reward) \
-                     + ', ' + str(current_time + run_spent)
 
-        file.write(log_string + '\n')
+        log_iteration = [iteration_number, self.metric, self.best_val, self.best_algo, self.clu_algos[arm],
+                         reward, current_time + run_spent]
+        self.params['iterations'] = self.params['iterations'] + log_iteration
+
+        print_log(', '.join([str(s) for s in log_iteration])+'\n')
+        # log_string = str(iteration_number) \
+        #              + ', ' + self.metric \
+        #              + ', ' + str(self.best_val) \
+        #              + ', ' + str(self.best_algo) \
+        #              + ', ' + str(self.clu_algos[arm]) \
+        #              + ', ' + str(reward) \
+        #              + ', ' + str(current_time + run_spent)
+
+        # file.write(log_string + '\n')
         file.flush()
         if self.same_res_counter >= self.params.max_no_improvement_iterations:
             return None
