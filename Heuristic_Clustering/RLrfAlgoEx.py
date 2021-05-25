@@ -60,7 +60,7 @@ class RLrfAlgoEx:
 
         log_iteration = [iteration_number, self.metric, self.best_val, self.best_algo, self.clu_algos[arm],
                          reward, current_time + run_spent]
-        self.params.result['iterations'] = self.params.result['iterations'] + log_iteration
+        self.params.result['iterations'] = self.params.result['iterations'] + np.array(log_iteration)
 
         print_log(file, ', '.join([str(s) for s in log_iteration])+'\n')
         # log_string = str(iteration_number) \
