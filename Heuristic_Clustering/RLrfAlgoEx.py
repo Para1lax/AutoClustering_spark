@@ -63,15 +63,7 @@ class RLrfAlgoEx:
         self.params.result['iterations'] = self.params.result['iterations'] + [np.array(log_iteration)]
 
         print_log(file, ', '.join([str(s) for s in log_iteration])+'\n')
-        # log_string = str(iteration_number) \
-        #              + ', ' + self.metric \
-        #              + ', ' + str(self.best_val) \
-        #              + ', ' + str(self.best_algo) \
-        #              + ', ' + str(self.clu_algos[arm]) \
-        #              + ', ' + str(reward) \
-        #              + ', ' + str(current_time + run_spent)
 
-        # file.write(log_string + '\n')
         file.flush()
         if self.same_res_counter >= self.params.max_no_improvement_iterations:
             return None

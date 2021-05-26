@@ -9,7 +9,6 @@ class RLthreadRFRS(ClusteringArmThread):
     def __init__(self, data: DataFrame, algorithm_name: str, metric: str, batch_size: int,
                  expansion=5000, params=None):
         self.run_count = batch_size
-        # TODO: rewrite ClusteringArmThread
         ClusteringArmThread.__init__(self, data, algorithm_name, metric,
                                      params=params)  # populates config space
         self.new_scenario(1)  # initial scenario
