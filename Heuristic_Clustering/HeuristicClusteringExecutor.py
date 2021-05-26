@@ -50,8 +50,6 @@ def run(spark_df, spark_context=None, metric='sil', output_file=None, batch_size
     -------
     """
 
-    true_labels = None
-
     if spark_context is None:
         spark_context = SparkContext.getOrCreate(SparkConf().setMaster("local[*]"))
 
@@ -73,7 +71,7 @@ def run(spark_df, spark_context=None, metric='sil', output_file=None, batch_size
     start = time.time()
 
     # Random initialization:
-    mab_solver.initialize(f, true_labels)
+    mab_solver.initialize(f)
     time_init = time.time() - start
     start = time.time()
     print_log(f, "iteration_number, metric, best_val, best_algo, algo, reward, time\n")
