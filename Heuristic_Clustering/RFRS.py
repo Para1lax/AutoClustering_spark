@@ -1,13 +1,11 @@
-import math
 import sys
-
-import numpy as np
-
 import time
 import typing
 
+import numpy as np
 from ConfigSpace import Configuration
 from ConfigSpace.util import get_one_exchange_neighbourhood
+from sklearn.ensemble import RandomForestRegressor
 from smac.configspace import convert_configurations_to_array
 # from smac.optimizer.objective import average_cost
 from smac.runhistory.runhistory import RunHistory
@@ -15,9 +13,6 @@ from smac.runhistory.runhistory2epm import RunHistory2EPM4Cost
 from smac.scenario.scenario import Scenario
 from smac.tae import StatusType
 from smac.tae.execute_ta_run_old import ExecuteTARunOld
-from sklearn.ensemble import RandomForestRegressor
-
-from .utils import debugging_printer
 
 
 class RFRS(object):
