@@ -21,13 +21,13 @@ class UCB(MabSolver):
         self.iter = 1
         self.is_fair = is_fair
 
-    def initialize(self, log_file, true_labels=None):
+    def initialize(self, log_file):
         """
         Initialize rewards. We use here the same value,
         gained by calculating metrics on randomly assigned labels.
         """
         print("\nInit UCB1")
-        print("\nparams.batch_size : {}".format(self.params.batch_size))
+        # print("\nparams.batch_size : {}".format(self.params.batch_size))
 
         # Random initialization of cluster labels
         self.action.data = self.action.data.withColumn('labels', round(rand()*self.params.n_clusters_upper_bound)\

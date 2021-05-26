@@ -33,7 +33,7 @@ class RLrfAlgoEx:
                              metric=self.metric, batch_size=self.batch_size, expansion=expansion))
             self.optimizers.append(self.th[i].optimizer)
 
-        self.rf = RandomForestRegressor(n_estimators=1000, random_state=42)
+        # self.rf = RandomForestRegressor(n_estimators=1000, random_state=42)
 
     def apply(self, arm, file, iteration_number, remaining_time=None, current_time=0):
         # RLthreadRFRS[arm]

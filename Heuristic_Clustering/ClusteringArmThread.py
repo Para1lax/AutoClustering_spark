@@ -42,26 +42,6 @@ class ClusteringArmThread:
 
         model = algorithm.fit(self.data)
 
-        # if Constants.DEBUG:
-        #     model.fit(self.data)
-        # else:
-        #     # Some problems with smac, old realization, don't change
-        #     try:
-        #         model.fit(self.data)
-        #     except:
-        #         try:
-        #             exc_info = sys.exc_info()
-        #             try:
-        #                 model.fit(self.data)  # try again
-        #             except:
-        #                 pass
-        #         finally:
-        #             print("Error occured while fitting " + self.algorithm_name)
-        #             print("Error occured while fitting " + self.algorithm_name, file=sys.stderr)
-        #             traceback.print_exception(*exc_info)
-        #             del exc_info
-        #             return Constants.bad_cluster
-
         if self.algorithm_name in Constants.rewrited:
             predictions = model.transform(self.data)
             self.current_labels = predictions
@@ -109,7 +89,8 @@ class ClusteringArmThread:
         k = UniformIntegerHyperparameter("k", 2, n_clusters_upper_bound)
         maxIter = UniformIntegerHyperparameter("maxIter", 5, 50)
         tol = UniformFloatHyperparameter("tol", 1e-6, 0.1)
-        return k, maxIter, tol
+        aggregationDepth = UniformIntegerHyperparameter("aggregationDepth", 2, 15)
+        return k, maxIter, tol, aggregationDepth
 
     @staticmethod
     def get_bisecting_kmeans_configspace(n_clusters_upper_bound):

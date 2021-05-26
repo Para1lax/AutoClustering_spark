@@ -41,7 +41,7 @@ class Softmax(MabSolver):
     #     # Because no actual clustering is involved, just random values
     #     # self.consume_limit(time.time() - start)
 
-    def initialize(self, log_file, true_labels=None):
+    def initialize(self, log_file):
         """
         Initialize rewards. We use here the same value,
         gained by calculating metrics on randomly assigned labels.
