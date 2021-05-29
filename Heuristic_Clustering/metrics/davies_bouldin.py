@@ -2,8 +2,8 @@ import numpy as np
 import math
 
 from pyspark.sql.functions import mean as _mean, col
-from measures.utils import *
-from measures.measure import Measure
+from metrics.utils import *
+from metrics.measure import Measure
 from pyspark import SparkContext, SQLContext
 
 
@@ -31,12 +31,11 @@ class DaviesIndex(Measure):
 
     def find(self, data, spark_context):
         n_clusters = get_n_clusters(data, data.columns[-1])
-        label_name = data.columns[-1]
         self.diameter = find_diameter(data, spark_context, 2)
         self.s_clusters = [0. for _ in range(n_clusters)]
         self.centroids = cluster_centroid(data, spark_context, n_clusters, 2)
         db = 0
-        self.cluster_sizes = count_cluster_sizes(data.select(label_name).collect(), n_clusters)
+        self.cluster_sizes = count_cluster_sizes(data, n_clusters, spark_context, 2)
         cluster_dists = [spark_context.accumulator(0.0) for _ in range(n_clusters)]
 
         def f(row, cluster_dists, centroids):
