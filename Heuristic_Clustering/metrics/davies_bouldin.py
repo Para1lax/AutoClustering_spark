@@ -38,9 +38,12 @@ class DaviesIndex(Measure):
         self.cluster_sizes = count_cluster_sizes(data, n_clusters, spark_context, 2)
         cluster_dists = [spark_context.accumulator(0.0) for _ in range(n_clusters)]
 
-        def f(row, cluster_dists, centroids):
+        def f(row, cluster_dists, centroind):
             label = row[-1]
-            cluster_dists[label] += euclidian_dist(row[:-2], centroids[label])
+            cluster_dists[label] += np.sqrt(np.sum(
+                np.square(np.array(row[:-2]) - centroind[row[-1]])))
+
+        centroind = self.centroids
 
         data.foreach(lambda row: f(row, cluster_dists, self.centroids))
 
