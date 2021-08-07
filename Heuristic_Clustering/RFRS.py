@@ -16,12 +16,7 @@ from smac.tae.execute_ta_run_old import ExecuteTARunOld
 
 
 class RFRS(object):
-    def __init__(self,
-                 scenario: Scenario,
-                 tae_runner: typing.Union[ExecuteTARunOld, typing.Callable],
-                 expansion_number=5000,
-                 batch_size=1):
-
+    def __init__(self, scenario, tae_runner, algo_name, expansion_number=5000, batch_size=1):
         self.rng = np.random.RandomState(seed=np.random.randint(10000))
         # already in runhistory
         # aggregate_func = average_cost
@@ -31,14 +26,13 @@ class RFRS(object):
         self.config_space = scenario.cs
         self.runhistory = RunHistory()
         self.rh2EPM = RunHistory2EPM4Cost(scenario=scenario, num_params=num_params,
-                                          success_states=[
-                                              StatusType.SUCCESS,
-                                              StatusType.CRASHED],
+                                          success_states=[StatusType.SUCCESS, StatusType.CRASHED],
                                           impute_censored_data=False, impute_state=None)
 
         self.expansion_number = expansion_number
         self.batch_size = batch_size
         self.model = RandomForestRegressor(n_estimators=100, random_state=42)
+        self.algo_name = algo_name
         # действующая конфигурация
         self.incumbent = None
         self.best_val = sys.float_info.max
@@ -52,9 +46,7 @@ class RFRS(object):
         return self.last_turn_min
 
     def optimize(self):
-
         processed = 0
-
         while processed < self.batch_size:
             # New configuration generation:
             # X (numpy.ndarray) – configuration vector x instance features
@@ -65,17 +57,10 @@ class RFRS(object):
             challengers = self.choose_next(X, Y)
 
             # Intensification:
-            for ch in challengers:
-                # cfg = Configuration(configuration_space=self.config_space, vector=ch)
-                cfg = ch
+            for cfg in challengers:
+                print('-> %s: %d/%d' % (self.algo_name, processed + 1, self.batch_size))
                 start_time = time.time()
-                value = self.tae_runner(cfg)
-                # try:
-                #     debugging_printer(place='RFRS.py -> optimize\nvalue = self.tae_runner(cfg)')
-                #     value = self.tae_runner(cfg)
-                # except:
-                #     value = sys.float_info.max
-
+                value = -self.tae_runner(cfg)
                 time_spent = time.time() - start_time
                 self.runhistory.add(cfg, value, time_spent, StatusType.SUCCESS)
                 if value <= self.best_val:
@@ -84,24 +69,19 @@ class RFRS(object):
                 processed += 1
                 if processed >= self.batch_size:
                     break
-
         return self.incumbent
 
     def choose_next(self, configuration_vector: np.ndarray, cost_values: np.ndarray):
-
         if len(cost_values) != 0:
             self.model.fit(configuration_vector, cost_values.ravel())
-
         weighted_challengers = self.expand()
 
         # sort
         weighted_challengers.sort(key=lambda x: x[0])
-
         self.update_min(weighted_challengers[0][0])
 
         # drop extra
         next_configs_by_acq_value = [_[1] for _ in weighted_challengers]
-
         return next_configs_by_acq_value
 
     def expand(self) -> [Configuration]:
@@ -116,11 +96,7 @@ class RFRS(object):
 
     def sorted_by_predictions(self, configs: [Configuration]) -> [Configuration]:
         configs_arr = convert_configurations_to_array(configs)
-
-        if self.runhistory.empty():
-            predictions = np.zeros(len(configs_arr))
-        else:
-            predictions = self.model.predict(configs_arr)
+        predictions = np.zeros(len(configs_arr)) if self.runhistory.empty() else self.model.predict(configs_arr)
         random_ind = self.rng.rand(len(predictions))
         # Last column is primary sort key!
         indices = np.lexsort((random_ind.flatten(), predictions.flatten()))
@@ -130,12 +106,10 @@ class RFRS(object):
 
     def update_min(self, cur_min):
         # Updates the lowest empirical cost for a configuration, across all configs
-
         configs = self.runhistory.get_all_configs()
-        if configs:
-            self.last_turn_min = min(cur_min, *[self.runhistory.get_min_cost(conf) for conf in configs])
-        else:
-            self.last_turn_min = cur_min
+        self.last_turn_min = min(
+            cur_min, *[self.runhistory.get_min_cost(conf) for conf in configs]
+        ) if configs else cur_min
 
     def get_by_local_search(self, num):
         if self.runhistory.empty():
@@ -152,33 +126,26 @@ class RFRS(object):
             acq_val, configuration = self._one_iter(start_point)
             configuration.origin = "Local Search"
             configs.append(configuration)
-
         # shuffle for random tie-break
         self.rng.shuffle(configs)
-
         return configs
 
     def _one_iter(self, start_point: Configuration) -> typing.Tuple[float, Configuration]:
 
         incumbent = start_point
-
         # Compute the acquisition value of the incumbent
         acq_val_incumbent = self.best_val
-
         local_search_steps = 0
         while True:
             local_search_steps += 1
             if local_search_steps > 1000:
                 break
-
             # Get neighborhood of the current incumbent
             # by randomly drawing configurations
             changed_inc = False
-
             # Get one exchange neighborhood returns an iterator (in contrast of
             # the previously returned list).
-            all_neighbors = get_one_exchange_neighbourhood(
-                incumbent, seed=self.rng.seed())
+            all_neighbors = get_one_exchange_neighbourhood(incumbent, seed=self.rng.seed())
 
             for neighbor in all_neighbors:
                 if not neighbor.is_valid_configuration():

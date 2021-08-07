@@ -3,7 +3,7 @@ from Constants import Constants
 
 class Parameters:
     def __init__(self, spark_context, algorithms=Constants.algos, n_clusters_upper_bound=15,
-                 bandit_timeout=30, time_limit=1000, batch_size=40, MAB_solver='ucb', tau=0.5,
+                 bandit_timeout=30, time_limit=1000, batch_size=25, mab_solver='softmax', tau=0.5,
                  max_no_improvement_iterations=None):
         self.result = dict()
         self.result['iterations'] = []
@@ -18,7 +18,7 @@ class Parameters:
         self.batch_size = batch_size
         # self.tuner_timeout = bandit_timeout * (bandit_iterations + 1) / self.num_algos
         self.tuner_timeout = time_limit
-        self.MAB_solver = MAB_solver
+        self.mab_solver = mab_solver
         self.tau = tau
         if max_no_improvement_iterations is None:
             self.max_no_improvement_iterations = float('inf')

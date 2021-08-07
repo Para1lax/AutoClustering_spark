@@ -3,8 +3,6 @@ import numpy as np
 from mab_solvers.Softmax import Softmax
 from mab_solvers.UCB import UCB
 
-from utils import debugging_printer
-
 s_norm = Softmax.softmax_normalize
 
 

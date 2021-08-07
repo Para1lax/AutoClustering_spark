@@ -8,27 +8,29 @@ from .Constants import Constants
 from .RLrfAlgoEx import RLrfAlgoEx
 from .mab_solvers.UCB_SRSU import UCBsrsu
 from .mab_solvers.Softmax import Softmax
-from .utils import debugging_printer, preprocess, print_log
+from .utils import print_log
 from .Parameters import Parameters
 
 
-
-def configure_mab_solver(data, metric, algorithm, params):
+def configure_mab_solver(spark_df, metric, algorithm, params):
     """
     Creates and configures the corresponding MAB-solver.
-    :param algorithm: algorithm to be used.
+    :param spark_df: preprocessed spark_dataframe.
+    :param metric: cluster measure [sil].
+    :param algorithm: algorithm to be used [ucb, softmax].
+    :param params: RL hyperparameters.
     """
-    algorithm_executor = RLrfAlgoEx(data=data, metric=metric, params=params, expansion=100)
-    if algorithm=='ucb':
+    algorithm_executor = RLrfAlgoEx(spark_df, metric=metric, params=params, expansion=100)
+    if algorithm == 'ucb':
         mab_solver = UCBsrsu(action=algorithm_executor, params=params)
-    elif algorithm=='softmax':
+    elif algorithm == 'softmax':
         mab_solver = Softmax(action=algorithm_executor, params=params)
     else:
         raise ValueError('Wrong algorithm. Algorithm should be \'ucb\' or \'softmax\'')
     return mab_solver
 
 
-def run(spark_df, spark_context=None, metric='sil', output_file=None, batch_size=40, timeout=30,
+def run(spark_df, metric='sil', output_file=None, batch_size=25, timeout=30,
         time_limit=1000, max_clusters=15, algorithms=Constants.algos, algorithm=Constants.algorithm, tau = 0.5,
         max_no_improvement_iterations=None):
     """
@@ -36,8 +38,8 @@ def run(spark_df, spark_context=None, metric='sil', output_file=None, batch_size
 
     Parameters
     ----------
-    spark_df : Spark dataframe
-    spark_context : Main entry point for Spark functionality
+    spark_df : Spark dataframe, which contains (int)'id' and (pyspark.DenseVector)'features' columns.
+    Use assemble(df, columns=None), make_id(spark_df) functions to prepare dataframe
     metric : One of realized metrics
     output_file : Path to file where you want to see logs
     batch_size : processed configurations at one time
@@ -50,49 +52,35 @@ def run(spark_df, spark_context=None, metric='sil', output_file=None, batch_size
     -------
     """
 
-    if spark_context is None:
-        spark_context = SparkContext.getOrCreate(SparkConf().setMaster("local[*]"))
-
+    spark_context = spark_df.rdd.context
+    assert 'id' in spark_df.columns and 'features' in spark_df.columns
     params = Parameters(spark_context, algorithms=algorithms, n_clusters_upper_bound=max_clusters,
                         bandit_timeout=timeout, time_limit=time_limit, batch_size=batch_size, tau=tau,
                         max_no_improvement_iterations=max_no_improvement_iterations)
 
-    if not output_file is None:
-        f = open(file=output_file, mode='w')
-    else:
-        f = None
+    f = open(file=output_file, mode='w') if output_file is not None else None
 
-    spark_df = preprocess(spark_df)
-
-    # core part:
     # initializing multi-arm bandit solver:
-    mab_solver = configure_mab_solver(spark_df, algorithm=algorithm, metric=metric, params=params)
-
     start = time.time()
-
-    # Random initialization:
+    mab_solver = configure_mab_solver(spark_df, metric, algorithm, params)
     mab_solver.initialize(f)
     time_init = time.time() - start
-    start = time.time()
     print_log(f, "iteration_number, metric, best_val, best_algo, algo, reward, time\n")
 
     # RUN actual Multi-Arm:
-    its = mab_solver.iterate(f)
+    start = time.time()
+    mab_solver.iterate(f)
     time_iterations = time.time() - start
-
-    # print("#PROFILE: time spent in initialize: " + str(time_init))
-    # print("#PROFILE: time spent in iterations:" + str(time_iterations))
-
-    # algorithm_executor
     algorithm_executor = mab_solver.action
 
-    params.result['Metric'] = metric + ' : ' + str(algorithm_executor.best_val)
+    params.result['Metric'] = metric + ' : ' + str(-algorithm_executor.best_val)
     params.result['Algorithm'] = algorithm_executor.best_algo
-    params.result['Target func calls'] = its * batch_size
+    params.result['Target func calls'] = mab_solver.its * batch_size
     params.result['Time init'] = time_init
     params.result['Time spent'] = time_iterations
     params.result['Arms played'] = mab_solver.n
     params.result['Arms algos'] = Constants.algos
+
     try:
         params.result['Arms avg time'] = [np.average(plays) for plays in mab_solver.spendings]
     except:

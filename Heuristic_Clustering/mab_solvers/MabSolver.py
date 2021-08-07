@@ -4,6 +4,7 @@ import time
 
 import numpy as np
 
+
 class TL:
     def __init__(self, time_limit):
         self.time_remaining = time_limit
@@ -21,10 +22,10 @@ class MabSolver(TL):
     def __init__(self, action, params=None):
         TL.__init__(self, params.tuner_timeout)
         self.params = params
-        self.sum_spendings = [0] * self.params.num_algos
-        self.spendings = [[] for i in range(0, self.params.num_algos)]
+        self.sum_spendings = np.ones(self.params.num_algos, dtype=np.int)
+        self.spendings = [[] for _ in range(self.params.num_algos)]
         self.action = action
-        self.time_limit = params.tuner_timeout
+        self.time_limit, self.its = params.tuner_timeout, 0
 
     @abc.abstractmethod
     def initialize(self, log_file):
@@ -39,20 +40,19 @@ class MabSolver(TL):
         """
         This method is for calculating reward.
         :param arm: the arm, which was called
-        :param time_consumed: time consumed by that arm to run
+        :param time_consum
+        ed: time consumed by that arm to run
         :param reward: reward gained by this call
         """
         return 0
 
-    def iteration(self, iteration_number, f, current_time=0):
+    def iteration(self, f, current_time=0):
         # choosing arm
         cur_arm = self.draw()
         start = time.time()
         # CALL ARM here:
         # the last arm call will be cut off if time limit exceeded.
-        reward = self.action.apply(cur_arm, f, iteration_number, self.time_remaining, current_time)
-        if reward is None:
-            return None
+        reward = self.action.apply(cur_arm, f, self.its, self.time_remaining, current_time)
         consumed = time.time() - start
         self.consume_limit(consumed)
         # Time spent on each algo
@@ -60,17 +60,14 @@ class MabSolver(TL):
         # all spendings
         self.spendings[cur_arm].append(consumed)
         self.register_action(cur_arm, consumed, reward)
+        self.its += 1
         return reward
 
     def iterate(self, log_file):
         start = time.time()
-        its = 0
+        self.its = 0
         while not self.is_limit_exceeded():
-            reward = self.iteration(its, log_file, int(time.time()-start))
-            its += 1
-            if reward is None:
-                break
-        return its
+            self.iteration(log_file, int(time.time() - start))
 
     @staticmethod
     def u_correction(sum_spendings, num_algos):

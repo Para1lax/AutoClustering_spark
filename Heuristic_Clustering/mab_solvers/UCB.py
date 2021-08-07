@@ -4,9 +4,8 @@ import numpy as np
 from pyspark.sql.functions import *
 from pyspark.sql.types import IntegerType
 
-import Metric
+from Metric import Measure, Distance
 from mab_solvers.MabSolver import MabSolver
-from utils import debugging_printer
 
 
 class UCB(MabSolver):
@@ -30,10 +29,10 @@ class UCB(MabSolver):
         # print("\nparams.batch_size : {}".format(self.params.batch_size))
 
         # Random initialization of cluster labels
-        self.action.data = self.action.data.withColumn('labels', round(rand()*self.params.n_clusters_upper_bound)\
-                                                       .cast(IntegerType()))
+        self.action.data = self.action.data.withColumn(
+            'labels', round(rand()*self.params.n_clusters_upper_bound).cast(IntegerType()))
 
-        res = Metric.metric(self.action.data)
+        res = Measure(Measure.SIL, Distance.euclidean)(self.action.data)
 
         # start = time.time()
         for i in range(0, self.params.num_algos):
