@@ -1,4 +1,4 @@
-from .HeuristicClusteringExecutor import run
-from .utils import assemble, make_id, pandas_to_spark
+from .HeuristicClustering import HeuristicClustering
+from .HeuristicDataset import HeuristicDataset
 
-__all__ = ['run', 'make_id', 'assemble', 'pandas_to_spark']
+__all__ = ['HeuristicClustering', 'HeuristicDataset']

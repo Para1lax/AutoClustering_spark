@@ -1,13 +1,15 @@
+import itertools
+
 import numpy as np
 import operator
-
 import pyspark
+
 from pyspark import RDD
 from numba import njit
 from itertools import starmap
 
-import utils
 from pyspark.sql.functions import round, rand
+from HeuristicDataset import HeuristicDataset as HD
 
 
 class Distance:
@@ -69,9 +71,11 @@ class Distance:
 class Measure:
     SIL, CH, SCORE, DB = 'silhouette', 'calinski_harabasz', 'score', 'davies_bouldin'
     DUNN, G31, G33, G41, G43, G51, G53 = 'dunn', 'g31', 'g33', 'g41', 'g43', 'g51', 'g53'
-    SV = 'sv'  # needs improvement
+    S_DBW, SV = 's_dbw', 'sv'  # needs improvement
 
-    functions = frozenset([SIL, CH, SCORE, DB, SV, DUNN, G31, G33, G41, G43, G51, G53])
+    functions = frozenset([SIL, CH, SCORE, DB, S_DBW, DUNN, G31, G33, G41, G43, G51, G53])
+    increasing = frozenset([SIL, CH, SCORE, DUNN, G31, G33, G41, G43, G51, G53])
+    decreasing = frozenset([DB, S_DBW])
 
     def __init__(self, algorithm, distance, **kw):
         if algorithm not in Measure.functions:
@@ -79,10 +83,10 @@ class Measure:
         self.algorithm, self.kw, self.measure_func = algorithm, kw, self.__getattribute__(algorithm)
         self.distance = distance if callable(distance) else getattr(Distance, distance)
 
-    def __call__(self, df, *args, **kwargs):
-        labels = utils.get_unique_labels(df)
+    def __call__(self, df, minimise=False):
+        labels = HD.get_unique_labels(df)
         if len(labels) < 2:
-            return float('-inf')
+            return float('inf') if minimise else float('-inf')
         clusters = [df.rdd.filter(lambda x: x.labels == label).cache() for label in labels]
         centroids, amounts = list(map(self.__get_centroid, clusters)), list(map(lambda c: c.count(), clusters))
         return self.measure_func(df, list(zip(clusters, centroids, amounts, labels)))
@@ -116,8 +120,8 @@ class Measure:
         return self.__dunn_index(clusters, self.__dunn_dist_5, self.__dunn_diam_3)
 
     def __dunn_index(self, clusters, dist, diam):
-        dists = [[dist(clusters[x], clusters[y]) for y in range(x)] for x in range(1, len(clusters))]
-        return min(map(min, *dists)) / max(map(diam, clusters))
+        dists = [dist(clusters[x], clusters[y]) for x in range(1, len(clusters)) for y in range(x)]
+        return min(dists) / max(map(diam, clusters))
 
     def __dunn_diam_1(self, cluster):
         return cluster[0].cartesian(cluster[0]).map(lambda pp: self.distance(pp[0].features, pp[1].features)).max()
@@ -208,6 +212,28 @@ class Measure:
                      for y in range(len(clusters))] for x in range(len(clusters))]
         return sum(starmap(min, s_matrix)) / v
 
+    def s_dbw(self, full_df, clusters):
+        clusters_norm, k = [np.linalg.norm(self.__sqr_sum(c[0], c[1])) for c in clusters], len(clusters)
+        stddev, global_x = np.sqrt(sum(clusters_norm)) / k, self.__sqr_sum(full_df.rdd) / full_df.count()
+        dens = [self.__den_single(c, stddev) for c in clusters]
+        den_matrix = [self.__den_pair(clusters[x], clusters[y], stddev) / max(dens[x], dens[y])
+                      if x != y and dens[x] != 0 and dens[y] != 0 else 0.0 for y in range(k) for x in range(k)]
+        return sum(clusters_norm) / (k * np.linalg.norm(global_x)) + sum(den_matrix) / (k * (k - 1))
+
+    def __sqr_sum(self, vectors, centroid=None):
+        c = centroid if centroid is not None else self.__get_centroid(vectors)
+        return vectors.map(lambda x: (x.features - c).values ** 2).reduce(operator.add)
+
+    def __den_single(self, cluster, stddev):
+        return self.__s_dbw_f(cluster[0], cluster[1], stddev)
+
+    def __den_pair(self, x, y, stddev):
+        pair_centroid = (x[1] + y[1]) / 2
+        return self.__s_dbw_f(x[0], pair_centroid, stddev) + self.__s_dbw_f(y[0], pair_centroid, stddev)
+
+    def __s_dbw_f(self, points, centroid, stddev):
+        return points.map(lambda p: self.distance(p.features, centroid)).filter(lambda d: d < stddev).count()
+
     @staticmethod
     def test_run():
         """
@@ -220,11 +246,10 @@ class Measure:
 
         sc = pyspark.SparkContext.getOrCreate(conf=pyspark.SparkConf().setMaster('local[2]').setAppName('measures'))
         df = pyspark.SQLContext(sc).read.csv(csv_path, header=True, inferSchema=True)
-        df = utils.make_id(utils.assemble(df, columns[0])).withColumnRenamed(columns[1], 'labels')
+        df = HD.make_id(HD.assemble(df, columns[0])).withColumnRenamed(columns[1], 'labels')
         true_df, random_df = df, df.withColumn('labels', round(rand() * (k - 1)).cast('int'))
 
         for metric in Measure.functions:
             measure = Measure(metric, distance)
             original, random = measure(true_df), measure(random_df)
             print("--> '%s': original: %f, random: %f" % (metric, original, random))
-

@@ -38,6 +38,7 @@ class MabSolver(TL):
     @abc.abstractmethod
     def register_action(self, arm, time_consumed, reward):
         """
+
         This method is for calculating reward.
         :param arm: the arm, which was called
         :param time_consum

@@ -1,8 +1,8 @@
 from ConfigSpace.hyperparameters import *
 from smac.configspace import ConfigurationSpace
 
-from custom_algorithms.DBSCAN import DBCSAN
-from custom_algorithms.SparkClusters import SparkCluster
+from clustering.DBSCAN import DBCSAN
+from clustering.SparkClusters import SparkCluster
 
 from Constants import Constants
 from utils import get_df_dimensions
