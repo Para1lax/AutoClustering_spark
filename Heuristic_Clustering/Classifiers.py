@@ -1,16 +1,16 @@
 import math
 import numpy as np
 
-from pyspark.ml.clustering import KMeans, GaussianMixture, BisectingKMeans
-from pyspark.sql import Row
-from pyspark.mllib.linalg import DenseVector
-
 from abc import abstractmethod
 
 from graphframes import *
 from itertools import combinations
 from collections import defaultdict
-from Metric import Distance
+
+from pyspark.ml.linalg import DenseVector
+from pyspark.sql import Row
+
+from Measure import Distance
 
 
 class Classifier:
@@ -34,16 +34,19 @@ class SparkCluster(Classifier):
 
 class KMeansSpark(SparkCluster):
     def __init__(self, **config):
+        from pyspark.ml.clustering import KMeans
         SparkCluster.__init__(self, KMeans, **config)
 
 
 class GaussianMixtureSpark(SparkCluster):
     def __init__(self, **config):
+        from pyspark.ml.clustering import GaussianMixture
         SparkCluster.__init__(self, GaussianMixture, **config)
 
 
 class BisectingKMeansSpark(SparkCluster):
     def __init__(self, **config):
+        from pyspark.ml.clustering import BisectingKMeans
         SparkCluster.__init__(self, BisectingKMeans, **config)
 
 
@@ -98,10 +101,10 @@ class DBCSAN(Classifier):
 
     def __call__(self, spark_ds):
         self.pivot = DenseVector(np.zeros(spark_ds.dims))
-        combine_cluster_rdd = spark_ds.df.rdd.\
-            flatMap(self.__distance_from_pivot).reduceByKey(lambda x, y: x + y).\
+        combine_cluster_rdd = spark_ds.df.rdd. \
+            flatMap(self.__distance_from_pivot).reduceByKey(lambda x, y: x + y). \
             flatMap(self.__scan).reduceByKey(lambda x, y: x.union(y)). \
-            flatMap(self.__label).reduceByKey(lambda x, y: x + y).\
+            flatMap(self.__label).reduceByKey(lambda x, y: x + y). \
             map(self.__combine_labels).cache()
         id_cluster_rdd = combine_cluster_rdd. \
             map(lambda x: Row(point=x[0], labels=x[1][0], core_point=x[2]))

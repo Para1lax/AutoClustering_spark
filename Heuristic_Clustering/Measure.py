@@ -1,79 +1,19 @@
-import itertools
-
 import numpy as np
 import operator
-import pyspark
 
 from pyspark import RDD
-from numba import njit
 from itertools import starmap
 
-from pyspark.sql.functions import round, rand
+from Distance import Distance
 from HeuristicDataset import HeuristicDataset as HD
-
-
-class Distance:
-    functions = frozenset(['euclidean', 'sqr_euclidean', 'manhattan', 'chebyshev', 'cosine'])
-    # numba requires numpy array, so should extract ndarray from pyspark.DenseVector
-
-    @staticmethod
-    def euclidean(x, y):
-        return Distance._numba_euclidean(x.values, y.values)
-
-    @staticmethod
-    @njit
-    def _numba_euclidean(x, y):
-        diff = x - y
-        return np.sqrt(np.sum(diff * diff))
-
-    @staticmethod
-    def sqr_euclidean(x, y):
-        return Distance._numba_sqr_euclidean(x.values, y.values)
-
-    @staticmethod
-    @njit
-    def _numba_sqr_euclidean(x, y):
-        diff = x - y
-        return np.sum(diff * diff)
-
-    @staticmethod
-    def manhattan(x, y):
-        return Distance._numba_manhattan(x.values, y.values)
-
-    @staticmethod
-    @njit
-    def _numba_manhattan(x, y):
-        diff = x - y
-        return np.sum(np.abs(diff))
-
-    @staticmethod
-    def chebyshev(x, y):
-        return Distance._numba_chebyshev(x.values, y.values)
-
-    @staticmethod
-    @njit
-    def _numba_chebyshev(x, y):
-        diff = x - y
-        return np.amax(np.abs(diff))
-
-    @staticmethod
-    def cosine(x, y):
-        return Distance._numba_cosine(x.values, y.values)
-
-    @staticmethod
-    @njit
-    def _numba_cosine(x, y):
-        x_norm = np.linalg.norm(x)
-        y_norm = np.linalg.norm(y)
-        return np.dot(x, y) / (x_norm * y_norm)
 
 
 class Measure:
     SIL, CH, SCORE, DB = 'silhouette', 'calinski_harabasz', 'score', 'davies_bouldin'
     DUNN, G31, G33, G41, G43, G51, G53 = 'dunn', 'g31', 'g33', 'g41', 'g43', 'g51', 'g53'
-    S_DBW, SV = 's_dbw', 'sv'  # needs improvement
+    S_DBW, SV, OS = 's_dbw', 'sv', 'os_index'  # needs improvement
 
-    functions = frozenset([SIL, CH, SCORE, DB, S_DBW, DUNN, G31, G33, G41, G43, G51, G53])
+    functions = np.array([CH, SIL, OS, G41, G31, G33, G41, G43, G51, G53, DUNN, SCORE, DB, S_DBW])
     increasing = frozenset([SIL, CH, SCORE, DUNN, G31, G33, G41, G43, G51, G53])
     decreasing = frozenset([DB, S_DBW])
 
@@ -82,14 +22,19 @@ class Measure:
             raise ValueError('No such measure algorithm: {}'.format(algorithm))
         self.algorithm, self.kw, self.measure_func = algorithm, kw, self.__getattribute__(algorithm)
         self.distance = distance if callable(distance) else getattr(Distance, distance)
+        self.should_decrease = algorithm in self.decreasing
 
-    def __call__(self, df, minimise=False):
+    def __call__(self, df, minimise=None):
         labels = HD.get_unique_labels(df)
         if len(labels) < 2:
-            return float('inf') if minimise else float('-inf')
+            return float('inf') if minimise is not None or minimise else float('-inf')
         clusters = [df.rdd.filter(lambda x: x.labels == label).cache() for label in labels]
         centroids, amounts = list(map(self.__get_centroid, clusters)), list(map(lambda c: c.count(), clusters))
-        return self.measure_func(df, list(zip(clusters, centroids, amounts, labels)))
+        result = self.measure_func(df, list(zip(clusters, centroids, amounts, labels)))
+        if minimise is None:
+            return result
+        sign = -1 if minimise ^ self.should_decrease else 1
+        return sign * result
 
     def __get_centroid(self, spark_rdd):
         return spark_rdd.map(lambda x: x.features).reduce(operator.add) / spark_rdd.count()
@@ -233,23 +178,3 @@ class Measure:
 
     def __s_dbw_f(self, points, centroid, stddev):
         return points.map(lambda p: self.distance(p.features, centroid)).filter(lambda d: d < stddev).count()
-
-    @staticmethod
-    def test_run():
-        """
-        Calculates all available measures on iris dataset twice:
-        once for original labels, another for randomly generated.
-        The same unit test can be found in MeasureTest.py
-        """
-        columns = (['sepal_length', 'sepal_width', 'petal_length', 'petal_width'], 'species')
-        csv_path, k, distance = './datasets/normalized/labled_iris.csv', 3, Distance.euclidean
-
-        sc = pyspark.SparkContext.getOrCreate(conf=pyspark.SparkConf().setMaster('local[2]').setAppName('measures'))
-        df = pyspark.SQLContext(sc).read.csv(csv_path, header=True, inferSchema=True)
-        df = HD.make_id(HD.assemble(df, columns[0])).withColumnRenamed(columns[1], 'labels')
-        true_df, random_df = df, df.withColumn('labels', round(rand() * (k - 1)).cast('int'))
-
-        for metric in Measure.functions:
-            measure = Measure(metric, distance)
-            original, random = measure(true_df), measure(random_df)
-            print("--> '%s': original: %f, random: %f" % (metric, original, random))

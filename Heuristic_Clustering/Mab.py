@@ -1,3 +1,4 @@
+import logging
 import time
 import numpy as np
 
@@ -7,27 +8,35 @@ from pyspark.sql.types import IntegerType as Int
 
 
 class MabSolver:
-    def __init__(self, ds, is_fair, optimisers):
-        self.optimisers, self.arms = optimisers, len(optimisers)
-        self.is_fair, self.arms_usage = is_fair, np.ones(self.arms, np.int)
+    def __init__(self, ds, is_fair, arms):
+        self.arms, self.is_fair = arms, is_fair
+        self.arms_usage = np.ones(self.arms, np.int)
         self.consumed = np.ones(self.arms, dtype=np.int)
 
-        init_measure = float('-inf')
-        while init_measure == float('-inf'):
+        logging.info('Initialising mab solver')
+        self.best_result, self.best_config = float('-inf'), {}
+        while self.best_result == float('-inf'):
             random_init = ds.df.withColumn('labels', round(rand() * ds.max_clusters).cast(Int()))
-            init_measure = ds.measure(random_init)
-        self.rewards = np.full(self.arms, init_measure)
+            self.best_result = ds.measure(random_init, minimise=False)
+        self.rewards, self.its = np.full(self.arms, self.best_result), 0
 
-    def __call__(self, batch_size, time_limit, *args, **kwargs):
-        self.its, remain = 0, time_limit
-        while remain > 0:
+    def __call__(self, optimisers, batch_size, time_limit):
+        while time_limit > 0:
             cur_arm, start = self.draw(), time.time()
-            arm_reward = self.optimisers[cur_arm](remain, batch_size)
+            algo = optimisers[cur_arm].algorithm
+            logging.info('Calling ' + algo + ' optimiser')
+            # optimisers are minimising reward, so need to inverse monotonicity
+            arm_reward = -optimisers[cur_arm](time_limit, batch_size)
             arm_time = time.time() - start
+            logging.info(str(int(arm_time)) + 's spent for ' + algo + ' optimisation')
+            if arm_reward > self.best_result:
+                self.best_result = arm_reward
+                self.best_config = dict(algorithm=algo, **optimisers[cur_arm].get_best_config())
             self.consumed[cur_arm] += arm_time
             self.arms_usage[cur_arm] += 1
-            self.its, remain = self.its + 1, remain - arm_time
+            self.its, time_limit = self.its + 1, time_limit - arm_time
             self.update(cur_arm, arm_reward)
+        return self.best_result, self.best_config
 
     @abstractmethod
     def draw(self):
@@ -38,8 +47,8 @@ class MabSolver:
 
 
 class SoftmaxMab(MabSolver):
-    def __init__(self, df, is_fair, optimisers):
-        MabSolver.__init__(self, df, is_fair, optimisers)
+    def __init__(self, df, is_fair, arms):
+        MabSolver.__init__(self, df, is_fair, arms)
 
     @staticmethod
     def soft_norm(x):
@@ -52,8 +61,8 @@ class SoftmaxMab(MabSolver):
 
 
 class UcbMab(MabSolver):
-    def __init__(self, df, is_fair, optimisers):
-        MabSolver.__init__(self, df, is_fair, optimisers)
+    def __init__(self, df, is_fair, arms):
+        MabSolver.__init__(self, df, is_fair, arms)
 
     def draw(self):
         x = self.rewards / (self.consumed / self.arms_usage) if self.is_fair else self.rewards

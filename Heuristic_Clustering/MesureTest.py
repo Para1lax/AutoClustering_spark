@@ -2,8 +2,8 @@ import unittest
 import pyspark
 from pyspark.sql.functions import rand, round
 
-from Metric import Distance, Measure
-from utils import *
+from Measure import Distance, Measure
+from HeuristicDataset import HeuristicDataset as HD
 
 
 class MeasureTest(unittest.TestCase):
@@ -20,7 +20,8 @@ class MeasureTest(unittest.TestCase):
     def setUpClass(cls):
         sc = pyspark.SparkContext.getOrCreate(conf=pyspark.SparkConf().setMaster('local[2]').setAppName('measures'))
         df = pyspark.SQLContext(sc).read.csv(MeasureTest.csv_path, header=True, inferSchema=True)
-        df = make_id(assemble(df, MeasureTest.columns[0])).withColumnRenamed(MeasureTest.columns[1], 'labels')
+
+        df = HD.make_id(HD.assemble(df, MeasureTest.columns[0])).withColumnRenamed(MeasureTest.columns[1], 'labels')
         cls.true_df, cls.random_df = df, df.withColumn('labels', round(rand() * (MeasureTest.k - 1)).cast('int'))
 
     def __invoke_measure(self, algorithm, should_increase=True):
