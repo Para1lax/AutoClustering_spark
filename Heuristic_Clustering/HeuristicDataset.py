@@ -15,22 +15,46 @@ from Distance import Distance
 
 
 class HeuristicDataset:
+    """
+    Wrapper for spark dataset. Provides preprocessing functions and measure predictor
+    """
+
+    # if spark session has not been created, default configuration for launch
     default_spark = pyspark.SparkConf().setMaster('[*]')
+
+    # local path of pickled CVI Predictor and its fit dataset
     cvi_fitness, cvi_path = 'meta_fitness.csv', 'cvi_predictor.pkl'
+
+    # conversions from pandas to spark data types
     eq_types = {'datetime64[ns]': TimestampType, 'int64': LongType, 'int32': IntegerType, 'float64': FloatType}
 
     def __init__(self, df, features=None, measure=None, max_clusters=15):
+        """
+        Parameters
+        ----------
+        df: either spark of pandas dataframe
+        features: list of column names, which specifies features of samples
+        measure: if measure is given, it will be applied, else recommendation by CVI Predictor will bi given
+        max_clusters: upper bound on clusters amount. Search will be in range [2, max_clusters]
+        """
         if isinstance(df, pd.DataFrame):
             sc = pyspark.SparkContext.getOrCreate(self.default_spark)
             df = self.pandas_to_spark(sc, df)
         elif not isinstance(df, pyspark.sql.DataFrame):
             raise ValueError('Expected pandas_df or spark_df')
 
-        logging.info('Preprocessing dataframe')
         self.df, self.max_clusters = self.make_id(self.vector_norm(self.assemble(df, features))), max_clusters
         self.df = self.df.withColumn('features', self.to_dense(self.df.features))
         self.dims, self.n = self.get_df_dimensions(self.df), self.df.count()
-        self.measure = measure if measure is not None else self.get_measure(df, columns=features)
+        from Measure import Measure
+        if issubclass(type(measure), Measure):
+            self.measure = measure
+        elif isinstance(measure, str) and measure in Measure.functions:
+            self.measure = Measure.make(measure, distance=Distance.euclidean)
+        elif measure is None:
+            self.measure = self.get_measure(df, columns=features)
+        else:
+            raise ValueError('Unknown measure argument: {}'.format(measure))
 
     @staticmethod
     def pandas_to_spark(spark_context, pandas_df):
@@ -46,20 +70,45 @@ class HeuristicDataset:
 
     @staticmethod
     def get_measure(df, columns=None):
+        """
+        Measure recommendation. Using predefined pickled CVI Predictor.
+        Parameters
+        ----------
+        df: spark dataframe
+        columns: list of column names, which represent sample's features
+
+        Returns
+        -------
+        Instance of Measure, which will be used to estimate clustering
+        """
         logging.info('Measure recommendation in process')
         columns = columns if columns is not None else df.columns
+        from Measure import Measure
+        # Define integer labels for measure to match with CVI Predictor output
+        cvi_measure_by_id = [Measure.CH, Measure.SIL, Measure.OS, Measure.G41]
         dir_path = os.path.dirname(os.path.realpath(__file__))
         with open(dir_path + '/' + HeuristicDataset.cvi_path, 'rb') as f:
             cvi_classifier = pickle.load(f)
             meta_features = HeuristicDataset.get_meta_features(df, columns)
             measure_id = cvi_classifier.predict(np.array([meta_features]))[0]
-            from Measure import Measure
-            measure_name = Measure.functions[measure_id]
+            measure_name = cvi_measure_by_id[measure_id]
             logging.info('Measure ' + measure_name + ' is selected')
-            return Measure(measure_name, Distance.euclidean)
+            return Measure.make(measure_name, distance=Distance.euclidean)
 
     @staticmethod
     def __columns_stat(norm, columns):
+        """
+        Not in use at the moment. Another approach to calculate meta-features of dataset
+        Parameters
+        ----------
+        norm: normalised to [0, 1] range spark dataframe (not vectorised!)
+        columns: list of column names, which represent sample's features
+
+        Returns
+        -------
+        Numpy array of 16 combinations of mean, variance, skewness and kurtosis,
+        applied for each column separately, then combined
+        """
         import pyspark.sql.functions as F
         from scipy.stats import tmean, tvar, skew, kurtosis
         meta_dims = [[norm.select(sql_func(col)).collect()[0][0] for col in columns]
@@ -70,6 +119,22 @@ class HeuristicDataset:
 
     @staticmethod
     def get_meta_features(df, features):
+        """
+        Extract meta-features of given dataframe in order to suggest recommendation by CVI Predictor.
+         Calculates all pairwise distances between samples. Normalises them to upper bound 1.0.
+         Extract statistical values: [mean, variance, standard deviation, skewness, kurtosis].
+         Next 10 values represents percentage of distances in ranges [0.0, 0.1), [0.1, 0.2), ... [0.9, 1.0];
+         To calculate the last 4 meta-features, distances values forced to obtain zero mean and unit variance;
+         after that count percentage of values in ranges [0, 1), [1, 2), [2, 3) and other positives
+        Parameters
+        ----------
+        df: source spark dataframe
+        features: list of column names, which represent sample's features
+
+        Returns
+        -------
+        Numpy array of 19 meta features in specified above order
+        """
         vectorised = HeuristicDataset.make_id(HeuristicDataset.assemble(df, features)). \
             rdd.map(lambda p: (p.id, p.features))
         distances = vectorised.cartesian(vectorised).map(
@@ -85,6 +150,16 @@ class HeuristicDataset:
 
     @staticmethod
     def get_rdd_stat(rdd):
+        """
+        Get statistical moments of given rdd
+        Parameters
+        ----------
+        rdd: pyspark.RDD of floats
+
+        Returns
+        -------
+        Numpy array of [mean, variance, standard deviation, skewness, kurtosis]
+        """
         rdd_mean, rdd_var = rdd.mean(), rdd.variance()
         rdd_std, n = np.sqrt(rdd_var), rdd.count()
         moment_3rd = rdd.map(lambda d: (d - rdd_mean) ** 3).sum() / n
@@ -94,25 +169,77 @@ class HeuristicDataset:
 
     @staticmethod
     def assemble(spark_df, columns=None):
+        """
+        Collects separate columns of spark dataframe into a single vector
+        Parameters
+        ----------
+        spark_df: source dataframe
+        columns: columns to assemble. If None, gather all columns of spark_df
+
+        Returns
+        -------
+        Spark dataframe with one vector column instead of specified list of columns
+        """
         drops = spark_df.columns if columns is None else columns
         return VectorAssembler(inputCols=drops, outputCol='features').transform(spark_df).drop(*drops)
 
     @staticmethod
     @udf(returnType=VectorUDT())
     def to_dense(features):
+        """
+        Converts spark vector (dense or sparse) to dense vector
+        Parameters
+        ----------
+        features: sparse or dense vector
+        Returns
+        -------
+        pyspark.ml.linalg.DenseVector
+        """
         return DenseVector(features.toArray())
 
     @staticmethod
     def make_id(spark_df):
+        """
+        Add column of unique identifiers, if column 'id' does not exist.
+        If column is provided, it is up to user to make sure of uniqueness
+        Parameters
+        ----------
+        spark_df: source dataframe
+
+        Returns
+        -------
+        Spark dataframe with column 'id'
+        """
         return spark_df if 'id' in spark_df.columns else spark_df.withColumn('id', unique_id())
 
     @staticmethod
     def get_df_dimensions(spark_df):
+        """
+        Counts the number of sample's dimensions
+        Parameters
+        ----------
+        spark_df: spark df with 'features' column
+
+        Returns
+        -------
+        Integer number of dims
+        """
         return len(spark_df.first().features) if 'features' in spark_df.columns \
             else len(spark_df.drop('id', 'features', 'labels').columns)
 
     @staticmethod
     def get_unique_labels(labeled_df, exclude_none=True):
+        """
+        Get list of unique labels of labeled dataframe
+        Parameters
+        ----------
+        labeled_df: spark dataframe with column 'labels'
+        exclude_none: if contains None, exclude it from result
+
+        Returns
+        -------
+        List of unique label values
+        """
         if 'labels' not in labeled_df.columns:
             raise ValueError("Dataframe does not contain column 'labels'\n. Columns are: {}".format(labeled_df.columns))
         labels = list(map(lambda sample: sample.labels, labeled_df.drop_duplicates(['labels']).collect()))
@@ -122,11 +249,32 @@ class HeuristicDataset:
 
     @staticmethod
     def vector_norm(vectorised_df):
+        """
+        Normalises vector column 'features'. Each vector component value compresses into range [0 .. 1]
+        Parameters
+        ----------
+        vectorised_df: spark dataframe with vectorised column 'features'
+
+        Returns
+        -------
+        Spark dataframe with vectorised column 'features', each component of vector in range [0 .. 1]
+        """
         normalised = MinMaxScaler(inputCol='features', outputCol='__f__').fit(vectorised_df).transform(vectorised_df)
         return normalised.drop('features').withColumnRenamed('__f__', 'features')
 
     @staticmethod
     def sparse_norm(df, columns=None):
+        """
+        Normalises input columns into range [0 .. 1]
+        Parameters
+        ----------
+        df: spark dataframe with separate columns of features
+        columns: list of column names to normalise. If None, normalise each column
+
+        Returns
+        -------
+        Spark dataframe with same columns, but normalised content
+        """
         columns, normalised = columns if columns is not None else df.columns, df
         vector = HeuristicDataset.vector_norm(HeuristicDataset.assemble(df, columns))
         return vector.rdd.map(lambda row: [*row.features.values.tolist()]).toDF(columns)
@@ -134,10 +282,11 @@ class HeuristicDataset:
     @staticmethod
     def _build_cvi_predictor():
         """
-        1 -> CH
-        2 -> SIL
-        3 -> OS
-        4 -> G41
+        Should not be used. Fits and serialises CVI Predictor
+          1 -> CH, 2 -> SIL, 3 -> OS, 4 -> G41
+        Returns
+        -------
+        Serialised by pickle model in 'cvi_path' file
         """
         from sklearn.model_selection import GridSearchCV
         from xgboost import XGBClassifier

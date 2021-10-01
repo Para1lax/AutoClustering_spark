@@ -13,7 +13,7 @@ from pyspark.sql import Row
 from Measure import Distance
 
 
-class Classifier:
+class Clusteriser:
     checkpoint_dir = './checkpoint'
 
     @abstractmethod
@@ -21,7 +21,7 @@ class Classifier:
         pass
 
 
-class SparkCluster(Classifier):
+class SparkCluster(Clusteriser):
     def __init__(self, model, **config):
         self.config = config
         self.model = model(**config)
@@ -50,7 +50,7 @@ class BisectingKMeansSpark(SparkCluster):
         SparkCluster.__init__(self, BisectingKMeans, **config)
 
 
-class DBCSAN(Classifier):
+class DBCSAN(Clusteriser):
     def __init__(self, **configuration):
         self.eps = configuration['eps']
         self.min_pts = configuration['min_pts']
@@ -115,7 +115,7 @@ class DBCSAN(Classifier):
         edges = combine_cluster_rdd.flatMap(
             lambda x: [Row(src=item[0], dst=item[1]) for item in combinations(x[1], 2)]
         ).toDF().distinct()
-        id_cluster_df.rdd.context.setCheckpointDir(Classifier.checkpoint_dir)
+        id_cluster_df.rdd.context.setCheckpointDir(Clusteriser.checkpoint_dir)
         g = GraphFrame(vertices, edges)
         connected_df = g.connectedComponents()
         id_cluster_df = id_cluster_df.join(
@@ -124,10 +124,10 @@ class DBCSAN(Classifier):
         return id_cluster_df.join(spark_ds.df, spark_ds.df.id == id_cluster_df.point, 'right').drop('point')
 
 
-get_classifier = {
+get_clusteriser = {
     'kmeans': KMeansSpark, 'gaussian_mixture': GaussianMixtureSpark,
     'bisecting_kmeans': BisectingKMeansSpark, 'dbscan': DBCSAN
 }
 
-available = frozenset(get_classifier.keys())
+available = frozenset(get_clusteriser.keys())
 native = frozenset(['kmeans', 'gaussian_mixture', 'bisecting_kmeans'])

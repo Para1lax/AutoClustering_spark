@@ -8,7 +8,17 @@ from pyspark.sql.types import IntegerType as Int
 
 
 class MabSolver:
+    """
+    Base class for switching clustering algorithms
+    """
     def __init__(self, ds, is_fair, arms):
+        """
+        Parameters
+        ----------
+        ds: initialised HeuristicDataset
+        is_fair: define solver's policy if he should consider time consuming
+        arms: amount of switching algorithms
+        """
         self.arms, self.is_fair = arms, is_fair
         self.arms_usage = np.ones(self.arms, np.int)
         self.consumed = np.ones(self.arms, dtype=np.int)
@@ -21,6 +31,17 @@ class MabSolver:
         self.rewards, self.its = np.full(self.arms, self.best_result), 0
 
     def __call__(self, optimisers, batch_size, time_limit):
+        """
+        Launches procedure of switching and optimising clustering algorithms configurations
+        Parameters
+        ----------
+        optimisers: list of HyperOptimiser (de-facto, arms)
+        batch_size: defines amount of algorithm calculations, when drawing a particular arm
+        time_limit: time budget (in seconds) for current run
+        Returns
+        -------
+        Pair of (the best reached measure value, the best configuration)
+        """
         while time_limit > 0:
             cur_arm, start = self.draw(), time.time()
             algo = optimisers[cur_arm].algorithm
@@ -30,13 +51,12 @@ class MabSolver:
             arm_time = time.time() - start
             logging.info(str(int(arm_time)) + 's spent for ' + algo + ' optimisation')
             if arm_reward > self.best_result:
-                self.best_result = arm_reward
-                self.best_config = dict(algorithm=algo, **optimisers[cur_arm].get_best_config())
+                self.best_result, self.best_arm = arm_reward, cur_arm
+                self.best_config = dict(**optimisers[cur_arm].get_best_config())
             self.consumed[cur_arm] += arm_time
             self.arms_usage[cur_arm] += 1
             self.its, time_limit = self.its + 1, time_limit - arm_time
             self.update(cur_arm, arm_reward)
-        return self.best_result, self.best_config
 
     @abstractmethod
     def draw(self):

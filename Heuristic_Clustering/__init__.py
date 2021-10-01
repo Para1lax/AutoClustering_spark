@@ -1,4 +1,7 @@
 from .HeuristicClustering import HeuristicClustering
-from .HeuristicDataset import HeuristicDataset
+import Clusteriser
+import HyperOptimiser
+import Mab
+import Measure
 
-__all__ = ['HeuristicClustering', 'HeuristicDataset']
+__all__ = ['HeuristicClustering', 'Clusteriser', 'Mab', 'HyperOptimiser', 'Measure', 'Distance']

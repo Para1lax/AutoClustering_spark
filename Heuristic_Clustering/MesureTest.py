@@ -2,7 +2,8 @@ import unittest
 import pyspark
 from pyspark.sql.functions import rand, round
 
-from Measure import Distance, Measure
+from Measure import Measure
+from Distance import Distance
 from HeuristicDataset import HeuristicDataset as HD
 
 
@@ -10,7 +11,6 @@ class MeasureTest(unittest.TestCase):
     """
     Calculates all available measures on iris dataset twice:
     once for original labels, another for randomly generated.
-    The same functionality is provided by Measure.test_run()
     """
 
     columns = (['sepal_length', 'sepal_width', 'petal_length', 'petal_width'], 'species')
@@ -24,14 +24,17 @@ class MeasureTest(unittest.TestCase):
         df = HD.make_id(HD.assemble(df, MeasureTest.columns[0])).withColumnRenamed(MeasureTest.columns[1], 'labels')
         cls.true_df, cls.random_df = df, df.withColumn('labels', round(rand() * (MeasureTest.k - 1)).cast('int'))
 
-    def __invoke_measure(self, algorithm, should_increase=True):
-        measure = Measure(algorithm, MeasureTest.distance)
+    def __invoke_measure(self, algorithm):
+        measure = Measure.make(algorithm, distance=MeasureTest.distance)
         original, random = measure(self.true_df), measure(self.random_df)
-        print("--> '%s': original: %f, random: %f" % (algorithm, original, random))
-        self.assertGreaterEqual(original, random) if should_increase else self.assertLessEqual(original, random)
+        print("$> '%s': original: %f, random: %f" % (algorithm, original, random))
+        self.assertLessEqual(original, random) if measure.should_decrease else self.assertGreaterEqual(original, random)
 
     def test_silhouette(self):
         self.__invoke_measure(Measure.SIL)
+
+    def test_os(self):
+        self.__invoke_measure(Measure.OS)
 
     def test_ch(self):
         self.__invoke_measure(Measure.CH)
@@ -40,7 +43,10 @@ class MeasureTest(unittest.TestCase):
         self.__invoke_measure(Measure.SCORE)
 
     def test_db(self):
-        self.__invoke_measure(Measure.DB, should_increase=False)
+        self.__invoke_measure(Measure.DB)
+
+    def test_sdbw(self):
+        self.__invoke_measure(Measure.S_DBW)
 
     def test_dunn(self):
         self.__invoke_measure(Measure.DUNN)
@@ -62,6 +68,3 @@ class MeasureTest(unittest.TestCase):
 
     def test_g53(self):
         self.__invoke_measure(Measure.G53)
-
-    def test_sv(self):
-        self.__invoke_measure(Measure.SV)
