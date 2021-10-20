@@ -1,4 +1,3 @@
-import logging
 import time
 import numpy as np
 
@@ -23,14 +22,13 @@ class MabSolver:
         self.arms_usage = np.ones(self.arms, np.int)
         self.consumed = np.ones(self.arms, dtype=np.int)
 
-        logging.info('Initialising mab solver')
         self.best_result, self.best_config = float('-inf'), {}
         while self.best_result == float('-inf'):
             random_init = ds.df.withColumn('labels', round(rand() * ds.max_clusters).cast(Int()))
             self.best_result = ds.measure(random_init, minimise=False)
         self.rewards, self.its = np.full(self.arms, self.best_result), 0
 
-    def __call__(self, optimisers, batch_size, time_limit):
+    def __call__(self, optimisers, batch_size, time_limit, logs):
         """
         Launches procedure of switching and optimising clustering algorithms configurations
         Parameters
@@ -44,12 +42,15 @@ class MabSolver:
         """
         while time_limit > 0:
             cur_arm, start = self.draw(), time.time()
-            algo = optimisers[cur_arm].algorithm
-            logging.info('Calling ' + algo + ' optimiser')
             # optimisers are minimising reward, so need to inverse monotonicity
             arm_reward = -optimisers[cur_arm](time_limit, batch_size)
             arm_time = time.time() - start
-            logging.info(str(int(arm_time)) + 's spent for ' + algo + ' optimisation')
+            logs.append(dict(
+                optimiser_calls_number=len(logs),
+                optimiser_call_time=arm_time,
+                clustering_algorithm=optimisers[cur_arm].algorithm,
+                batch_runs_log=optimisers[cur_arm].configs_searched
+            ))
             if arm_reward > self.best_result:
                 self.best_result, self.best_arm = arm_reward, cur_arm
                 self.best_config = dict(**optimisers[cur_arm].get_best_config())

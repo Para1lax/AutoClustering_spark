@@ -10,7 +10,7 @@ class HyperOptimiser:
     INT, FLOAT, CATEGORY = 'int', 'float', 'categorical'
 
     def __init__(self, algorithm, ds):
-        self.algorithm, self.ds = algorithm, ds
+        self.algorithm, self.ds, self.configs_searched = algorithm, ds, []
         self.clusteriser = Clusteriser.get_clusteriser[algorithm]
         # get configuration space for algorithm as builtin dict
         self.get_config = self.__getattribute__(algorithm + '_config')
@@ -82,8 +82,11 @@ class SmacOptimiser(HyperOptimiser):
         self.run_history, self.best_config = RunHistory(), self.cs.get_default_configuration()
 
     def opt_function(self, config):
+        self.configs_searched.append(config)
         predictions = self.clusteriser(**config)(self.ds)
-        return self.ds.measure(predictions, minimise=True)
+        result = self.ds.measure(predictions, minimise=True)
+        self.configs_searched.append(dict(measure_value=result, **config))
+        return result
 
     def __call__(self, time_limit, batch_size):
         from smac.scenario.scenario import Scenario
@@ -128,9 +131,12 @@ class OptunaOptimiser(HyperOptimiser):
             suggest = self.__hyper_map__[space[0]]
             config[name] = suggest(trial, name, *space[1])
         predictions = self.clusteriser(**config)(self.ds)
-        return self.ds.measure(predictions, minimise=True)
+        result = self.ds.measure(predictions, minimise=True)
+        self.configs_searched.append(dict(measure_value=result, **config))
+        return result
 
     def __call__(self, time_limit, batch_size):
+        self.configs_searched.clear()
         self.session.optimize(self.objective, n_trials=batch_size, timeout=time_limit)
         return self.session.best_value
 

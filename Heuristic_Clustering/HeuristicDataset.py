@@ -3,7 +3,6 @@ import pickle
 
 import numpy as np
 import pandas as pd
-import logging
 
 import pyspark
 from pyspark.sql.functions import monotonically_increasing_id as unique_id, udf
@@ -81,7 +80,6 @@ class HeuristicDataset:
         -------
         Instance of Measure, which will be used to estimate clustering
         """
-        logging.info('Measure recommendation in process')
         columns = columns if columns is not None else df.columns
         from Measure import Measure
         # Define integer labels for measure to match with CVI Predictor output
@@ -92,7 +90,6 @@ class HeuristicDataset:
             meta_features = HeuristicDataset.get_meta_features(df, columns)
             measure_id = cvi_classifier.predict(np.array([meta_features]))[0]
             measure_name = cvi_measure_by_id[measure_id]
-            logging.info('Measure ' + measure_name + ' is selected')
             return Measure.make(measure_name, distance=Distance.euclidean)
 
     @staticmethod

@@ -1,4 +1,4 @@
-import logging
+import time
 
 import HyperOptimiser
 import Mab
@@ -29,6 +29,7 @@ class HeuristicClustering:
          Options are available by HyperOptimeser.available
          Default is 'optuna'
         """
+
         assert hpo in HyperOptimiser.available, \
             'Unknown HPO: {}. Available: {}'.format(hpo, HyperOptimiser.available)
         for algorithm in algorithms:
@@ -37,15 +38,20 @@ class HeuristicClustering:
         assert mab_solver in Mab.available,\
             'Unknown mab_solver: {}. Available: {}'.format(mab_solver, Mab.available)
 
-        logging.basicConfig(level=logging.INFO)
+        start_init = time.time()
         spark_dataset = HeuristicDataset(spark_df)
         self.hpo = HyperOptimiser.get_optimiser[hpo]
         self.optimisers = [self.hpo(algorithm, spark_dataset) for algorithm in algorithms]
 
         fair_mab = mab_solver.startswith('fair_')
         self.mab_solver = Mab.get_solver[mab_solver](spark_dataset, fair_mab, len(self.optimisers))
+        self.logs = dict(
+            measure=spark_dataset.measure.algorithm,
+            hyper_optimiser=hpo, mab_solver=mab_solver,
+            init_time=time.time() - start_init, run_logs=list()
+        )
 
-    def __call__(self, batch_size=20, time_limit=1000):
+    def __call__(self, batch_size, time_limit):
         """
         Actual launch of execution for a given seconds
         Parameters
@@ -56,11 +62,10 @@ class HeuristicClustering:
 
         Returns
         -------
-        Pair of (the best reached measure value, the best configuration)
+        Dict of best { algorithm, result, config, labels, used measure }
         """
-        self.mab_solver(self.optimisers, batch_size, time_limit)
+        self.mab_solver(self.optimisers, batch_size, time_limit, self.logs['run_logs'])
         best_opt = self.optimisers[self.mab_solver.best_arm]
-        logging.info('Collecting results')
         return dict(
             algorithm=best_opt.algorithm,
             metric=best_opt.ds.measure.algorithm,
