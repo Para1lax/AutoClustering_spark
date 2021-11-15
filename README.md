@@ -1,28 +1,7 @@
-# AutoClustering_spark
-This is new repository devoted to the development of AutoClustering framework in Apache Spark
+# AutoClustering
+This is a new repository devoted to the development of AutoClustering framework.
 
-**Realized algorithms:** KMeans, BisectingKMeans, Gaussian mixture
+It's core was developed using PySpark 3.0.0, and it is recommended to use this exact
+version (GraphFrames 0.6 was the latest compatible version with PySpark 3+ version during development).
 
-**Realized metrics:** sil _(waiting for more)_
-
-#### To run:
-
-```
-from heuristic_clustering import run
-
-# data - your data in pyspark dataframe
-# metric - one of realized metrics
-# log_file - path to file where you want to see logs
-result = run(data, seed, metric, log_file)
-```
-
-#### To run spark in Colab:
-
-```
-!apt-get update
-!apt-get upgrade
-!apt-get install openjdk-8-jdk-headless -qq > /dev/null
-!wget -q https://www-us.apache.org/dist/spark/spark-2.4.1/spark-2.4.1-bin-hadoop2.7.tgz
-!tar xf spark-2.4.1-bin-hadoop2.7.tgz
-!pip install -q findspark
-```
+See **example.py** for how-to-run guide. For more information read in-code docs

@@ -1,0 +1,72 @@
+import time
+
+import HyperOpt
+import Mab
+import Clusteriser
+
+
+class AutoCluster:
+    """
+    The entry point of the framework. Should be configured only once, then can be launched multiple times
+    """
+    def __init__(self, auto_dataset, algorithms=Clusteriser.native,
+                 mab_solver='fair_softmax', hpo='optuna'):
+        """
+        Framework configuration
+        Parameters
+        ----------
+        auto_dataset: preprocessed AutoDataset
+        algorithms: list<string> of clustering algorithms to use.
+         Options are available by Clusteriser.available.
+         Default is ['kmeans', 'gaussian_mixture', 'bisecting_kmeans']
+        mab_solver: <string> algorithm used to switch clustering algorithms.
+         Options are available by Mab.available
+         Default is 'fair_softmax'
+        hpo: <string> hyper parameter optimiser,
+         searches for best solution for each clustering algorithm individually.
+         Options are available by HyperOpt.available
+         Default is 'optuna'
+        """
+
+        assert hpo in HyperOpt.available, \
+            'Unknown HPO: {}. Available: {}'.format(hpo, HyperOpt.available)
+        for algorithm in algorithms:
+            assert algorithm in Clusteriser.available,\
+                'Unknown algorithm: {}. Available: {}'.format(algorithm, Clusteriser.available)
+        assert mab_solver in Mab.available,\
+            'Unknown mab_solver: {}. Available: {}'.format(mab_solver, Mab.available)
+
+        start_init = time.time()
+        self.hpo = HyperOpt.get_optimiser[hpo]
+        self.optimisers = [self.hpo(algorithm, auto_dataset) for algorithm in algorithms]
+
+        fair_mab = mab_solver.startswith('fair_')
+        self.mab_solver = Mab.get_solver[mab_solver](auto_dataset, fair_mab, len(self.optimisers))
+        self.logs = dict(
+            measure=auto_dataset.measure.algorithm,
+            hyper_optimiser=hpo, mab_solver=mab_solver,
+            init_time=time.time() - start_init, run_logs=list()
+        )
+
+    def __call__(self, batch_size, time_limit):
+        """
+        Actual launch of execution for a given seconds
+        Parameters
+        ----------
+        batch_size: amount of different configurations, which will be applied to clustering algorithm,
+         selected by mab solver. Default is 20
+        time_limit: time budget (in seconds) for current run. Default is 1000
+
+        Returns
+        -------
+        Dict of best { algorithm, result, config, labels, used measure }
+        """
+        self.mab_solver(self.optimisers, batch_size, time_limit, self.logs['run_logs'])
+        best_opt = self.optimisers[self.mab_solver.best_arm]
+        return dict(
+            algorithm=best_opt.algorithm,
+            metric=best_opt.ds.measure.algorithm,
+            result=self.mab_solver.best_result,
+            config=self.mab_solver.best_config,
+            labels=best_opt.get_labels_by_config(self.mab_solver.best_config)
+        )
